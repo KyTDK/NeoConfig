@@ -1,0 +1,7 @@
+name: NeoConfig
+version: '${project.version}'
+main: com.neomechanical.neoconfig.NeoConfig
+api-version: 1.19
+authors: [ NeoDevs ]
+description: Ingame config editor
+website: https://neomechanical.com
