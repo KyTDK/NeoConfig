@@ -73,12 +73,18 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>com.neomechanical.neoconfig</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>net.wesjd.anvilgui</pattern>
+                            <shadedPattern>com.neomechanical.neoconfig.anvilgui</shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
+                        </relocation>
                     </relocations>
+                    <minimizeJar>false</minimizeJar> <!-- Ensure not set to true -->
                     <artifactSet>
                         <includes>
                             <include>org.bstats</include>
                             <include>com.github.KyTDK:NeoUtils</include>
                             <include>net.kyori</include>
+                            <include>net.wesjd</include>
                         </includes>
                     </artifactSet>
                 </configuration>
@@ -113,6 +119,10 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>codemc-snapshots</id>
+            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -144,7 +154,7 @@
         <dependency>
             <groupId>com.github.KyTDK</groupId>
             <artifactId>NeoUtils</artifactId>
-            <version>1.10.1</version>
+            <version>1.10.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -165,6 +175,11 @@
             <artifactId>adventure-text-minimessage</artifactId>
             <version>4.11.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.wesjd</groupId>
+            <artifactId>anvilgui</artifactId>
+            <version>1.5.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <properties>
