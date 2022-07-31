@@ -1,7 +1,11 @@
 package com.neomechanical.neoconfig.commands;
 
+import com.neomechanical.neoconfig.menu.ConfigMenu;
 import com.neomechanical.neoutils.commandManager.Command;
+import com.neomechanical.neoutils.inventory.InventoryUtil;
+import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +38,9 @@ public class MainCommand extends Command {
 
     @Override
     public void perform(CommandSender player, String[] args) {
-
+        Player playerAsPlayer = (Player) player;
+        InventoryGUI inventoryGUI = ConfigMenu.generateMenu();
+        InventoryUtil.openInventory(playerAsPlayer, inventoryGUI);
     }
 
     @Override
