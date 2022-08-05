@@ -15,27 +15,28 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 public class ConfigMenu {
-    public static InventoryGUI generateMenu() {
-        //get plugins
-        List<Plugin> plugins = Arrays.stream(Bukkit.getPluginManager().getPlugins()).toList();
-        InventoryGUI menu = InventoryUtil.createInventoryGUI(null, 54, "NeoConfig");
-        for (Plugin plugin : plugins) {
-            ItemStack item = ItemUtil.createItem(Material.BOOKSHELF, ChatColor.RESET+plugin.getName());
-
+    public static InventoryGUI generateMenu(@Nullable Plugin plugin) {
+        if (plugin != null) {
             //Create plugin menu with all the keys
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
             if(addFiles(plugin, pluginMenu)) {
                 //Add pluginMenu item to main menu
-                InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
-                menu.addItem(inventoryItem);
+                InventoryUtil.registerGUI(pluginMenu);
+                return pluginMenu;
             }
-            InventoryUtil.registerGUI(pluginMenu);
+        }
+        InventoryGUI menu = InventoryUtil.createInventoryGUI(null, 54, "NeoConfig");
+        //get plugins
+        List<Plugin> plugins = Arrays.stream(Bukkit.getPluginManager().getPlugins()).toList();
+        for (Plugin p : plugins) {
+            createPluginItem(p, menu);
         }
         InventoryUtil.registerGUI(menu);
         return menu;
@@ -84,5 +85,17 @@ public class ConfigMenu {
             InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key), null);
             keyMenu.addItem(inventoryItem);
         }
+    }
+    private static void createPluginItem(Plugin p, InventoryGUI menu) {
+        ItemStack item = ItemUtil.createItem(Material.BOOKSHELF, ChatColor.RESET+p.getName());
+
+        //Create plugin menu with all the keys
+        InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
+        if(addFiles(p, pluginMenu)) {
+            //Add pluginMenu item to main menu
+            InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
+            menu.addItem(inventoryItem);
+        }
+        InventoryUtil.registerGUI(pluginMenu);
     }
 }
