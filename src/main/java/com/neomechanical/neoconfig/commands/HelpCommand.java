@@ -50,14 +50,14 @@ public class HelpCommand extends SubCommand {
         int page = 1;
         if (args.length == 2) {
             if (Integer.getInteger(args[1]) == null) {
-                messageUtil.sendMM(player, "<red><bold>Invaild syntax");
+                messageUtil.sendMM(player, "<red><bold>Invalid syntax");
                 return;
             }
             page = Integer.getInteger(args[1]);
         }
         List<SubCommand> pageList = Pagination.getPage(commandManager.getSubcommands(), page, 10);
         if (pageList == null) {
-            messageUtil.sendMM(player, "<red><bold>Invaild syntax");
+            messageUtil.sendMM(player, "<red><bold>Invalid syntax");
             return;
         }
         for (SubCommand subCommand : pageList) {

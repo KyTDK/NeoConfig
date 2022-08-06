@@ -11,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +46,7 @@ public class EditCommand extends SubCommand {
     public void perform(CommandSender player, String[] args) {
         Player playerAsPlayer = (Player) player;
         InventoryGUI inventoryGUI;
-        Plugin plugin = Bukkit.getPluginManager().getPlugin(args[0]);
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);
         if (plugin == null) {
             new MessageUtil(NeoConfig.adventure()).sendMM(player, "<red><bold>Plugin not found");
             return;
@@ -55,7 +57,15 @@ public class EditCommand extends SubCommand {
 
     @Override
     public List<String> tabSuggestions() {
-        return null;
+        List<String> suggestions = new ArrayList<>();
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            File[] dataFolder = plugin.getDataFolder().listFiles((directory, fileName) -> fileName.endsWith(".yml"));
+            if (dataFolder == null) {
+                continue;
+            }
+            suggestions.add(plugin.getName());
+        }
+        return suggestions;
     }
 
     @Override
