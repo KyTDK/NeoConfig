@@ -1,6 +1,5 @@
 package com.neomechanical.neoconfig.commands;
 
-import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoconfig.utils.messages.Messages;
 import com.neomechanical.neoutils.commandManager.CommandManager;
 import com.neomechanical.neoutils.commandManager.SubCommand;
@@ -45,19 +44,19 @@ public class HelpCommand extends SubCommand {
 
     @Override
     public void perform(CommandSender player, String[] args) {
-        MessageUtil messageUtil = new MessageUtil(NeoConfig.adventure());
+        MessageUtil messageUtil = new MessageUtil();
         messageUtil.neoComponentMessage();
         int page = 1;
         if (args.length == 2) {
             if (Integer.getInteger(args[1]) == null) {
-                messageUtil.sendMM(player, "<red><bold>Invalid syntax");
+                MessageUtil.sendMM(player, "<red><bold>Invalid syntax");
                 return;
             }
             page = Integer.getInteger(args[1]);
         }
         List<SubCommand> pageList = Pagination.getPage(commandManager.getSubcommands(), page, 10);
         if (pageList == null) {
-            messageUtil.sendMM(player, "<red><bold>Invalid syntax");
+            MessageUtil.sendMM(player, "<red><bold>Invalid syntax");
             return;
         }
         for (SubCommand subCommand : pageList) {

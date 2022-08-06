@@ -48,7 +48,7 @@ public class EditCommand extends SubCommand {
         InventoryGUI inventoryGUI;
         Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);
         if (plugin == null) {
-            new MessageUtil(NeoConfig.adventure()).sendMM(player, "<red><bold>Plugin not found");
+            MessageUtil.sendMM(player, "<red><bold>Plugin not found");
             return;
         }
         inventoryGUI = new ConfigMenu(NeoConfig.getInstance()).generateMenu(plugin);

@@ -58,6 +58,7 @@ public class ConfigMenu {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
             //Create YML item with all keys
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
+            keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
             addKeys(config, file, keysMenu);
             InventoryUtil.registerGUI(keysMenu);
@@ -77,6 +78,7 @@ public class ConfigMenu {
             ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET + key.getName());
             //Create GUI for all the keys
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
+            keyMenu.setOpenOnClose(configYMLMenu);
             addSubKeys(config, file, key, keyMenu);
             InventoryUtil.registerGUI(keyMenu);
             InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
@@ -91,7 +93,7 @@ public class ConfigMenu {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
-            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key, plugin), null);
+            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key, keyMenu, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
     }
@@ -106,6 +108,7 @@ public class ConfigMenu {
             InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
             menu.addItem(inventoryItem);
         }
+        pluginMenu.setOpenOnClose(menu);
         InventoryUtil.registerGUI(pluginMenu);
     }
 }

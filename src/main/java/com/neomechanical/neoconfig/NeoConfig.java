@@ -1,6 +1,7 @@
 package com.neomechanical.neoconfig;
 
 import com.neomechanical.neoconfig.commands.RegisterCommands;
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import lombok.NonNull;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -31,6 +32,7 @@ public final class NeoConfig extends JavaPlugin {
         InventoryUtil.init(NeoConfig.getInstance());
         RegisterCommands.register();
         setupBStats();
+        NeoUtils.init(this);
     }
 
     public void setupBStats() {
