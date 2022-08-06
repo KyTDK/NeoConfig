@@ -1,11 +1,11 @@
 package com.neomechanical.neoconfig.menu.actions;
 
-import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoutils.inventory.GUIAction;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,14 +16,17 @@ public class ChangeKey extends GUIAction {
     private final String subKey;
     private final File file;
     private final FileConfiguration config;
+    private final Plugin plugin;
 
-    public ChangeKey(Object initialKeyValue, String subKey, FileConfiguration config, File file, ConfigurationSection key) {
+    public ChangeKey(Object initialKeyValue, String subKey, FileConfiguration config, File file, ConfigurationSection key, Plugin plugin) {
         this.initialKeyValue = initialKeyValue;
         this.subKey = subKey;
         this.config = config;
         this.key = key;
         this.file = file;
+        this.plugin = plugin;
     }
+
     @Override
     public void action(Player player) {
         new AnvilGUI.Builder()
@@ -48,7 +51,7 @@ public class ChangeKey extends GUIAction {
                 })
                 .text(initialKeyValue.toString())                              //sets the text the GUI should start with
                 .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
-                .plugin(NeoConfig.getInstance())                                          //set the plugin instance
+                .plugin(plugin)                                          //set the plugin instance
                 .open(player);
     }
 }

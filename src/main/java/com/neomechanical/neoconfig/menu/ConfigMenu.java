@@ -22,11 +22,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ConfigMenu {
-    public static InventoryGUI generateMenu(@Nullable Plugin plugin) {
+    private final Plugin plugin;
+
+    public ConfigMenu(Plugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public InventoryGUI generateMenu(@Nullable Plugin plugin) {
         if (plugin != null) {
             //Create plugin menu with all the keys
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
-            if(addFiles(plugin, pluginMenu)) {
+            if (addFiles(plugin, pluginMenu)) {
                 //Add pluginMenu item to main menu
                 InventoryUtil.registerGUI(pluginMenu);
                 return pluginMenu;
@@ -41,8 +47,9 @@ public class ConfigMenu {
         InventoryUtil.registerGUI(menu);
         return menu;
     }
+
     //PluginMenu contains all the plugins interface items
-    private static boolean addFiles(Plugin plugin, InventoryGUI pluginMenu) {
+    private boolean addFiles(Plugin plugin, InventoryGUI pluginMenu) {
         File[] dataFolder = plugin.getDataFolder().listFiles((directory, fileName) -> fileName.endsWith(".yml"));
         if (dataFolder == null) {
             return false;
@@ -54,44 +61,47 @@ public class ConfigMenu {
             //Add Key items to configYMLMenu
             addKeys(config, file, keysMenu);
             InventoryUtil.registerGUI(keysMenu);
-            ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET+file.getName());
+            ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
             InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
             pluginMenu.addItem(ymlFile);
         }
         return true;
     }
-    private static void addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu) {
-            ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(config);
-            for (ConfigurationSection key : keys) {
-                if (key == null) {
-                    continue;
-                }
-                ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET+key.getName());
-                //Create GUI for all the keys
-                InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null,54, key.getName());
-                addSubKeys(config, file, key, keyMenu);
-                InventoryUtil.registerGUI(keyMenu);
-                InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
-                //Add keyMenu item to configYMLMenu
-                configYMLMenu.addItem(inventoryItem);
+
+    private void addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu) {
+        ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(config);
+        for (ConfigurationSection key : keys) {
+            if (key == null) {
+                continue;
             }
+            ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET + key.getName());
+            //Create GUI for all the keys
+            InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
+            addSubKeys(config, file, key, keyMenu);
+            InventoryUtil.registerGUI(keyMenu);
+            InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
+            //Add keyMenu item to configYMLMenu
+            configYMLMenu.addItem(inventoryItem);
+        }
     }
-    private static void addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu) {
+
+    private void addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu) {
         for (String subKey : key.getKeys(false)) {
             if (subKey == null) {
                 continue;
             }
-            ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET+subKey);
-            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key), null);
+            ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
+            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
     }
-    private static void createPluginItem(Plugin p, InventoryGUI menu) {
-        ItemStack item = ItemUtil.createItem(Material.BOOKSHELF, ChatColor.RESET+p.getName());
+
+    private void createPluginItem(Plugin p, InventoryGUI menu) {
+        ItemStack item = ItemUtil.createItem(Material.BOOKSHELF, ChatColor.RESET + p.getName());
 
         //Create plugin menu with all the keys
         InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
-        if(addFiles(p, pluginMenu)) {
+        if (addFiles(p, pluginMenu)) {
             //Add pluginMenu item to main menu
             InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
             menu.addItem(inventoryItem);

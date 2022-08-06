@@ -51,7 +51,7 @@ public class EditCommand extends SubCommand {
             new MessageUtil(NeoConfig.adventure()).sendMM(player, "<red><bold>Plugin not found");
             return;
         }
-        inventoryGUI = ConfigMenu.generateMenu(plugin);
+        inventoryGUI = new ConfigMenu(NeoConfig.getInstance()).generateMenu(plugin);
         InventoryUtil.openInventory(playerAsPlayer, inventoryGUI);
     }
 
