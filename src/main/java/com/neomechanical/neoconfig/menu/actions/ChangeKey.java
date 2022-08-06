@@ -57,10 +57,9 @@ public class ChangeKey extends GUIAction {
                     InventoryUtil.openInventory(player, restoreInventory);
                     return AnvilGUI.Response.close();
                 })
-                .onComplete((playerAuthor, text) -> {//called when the inventory output slot is clicked
-
-                    return AnvilGUI.Response.close();
-                }).text(initialKeyValue.toString())
+                .onClose(playerAuthor -> {//called when the inventory is closed
+                    InventoryUtil.openInventory(player, restoreInventory);
+                })
                 .text(initialKeyValue.toString())                              //sets the text the GUI should start with
                 .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
                 .plugin(plugin)                                          //set the plugin instance
