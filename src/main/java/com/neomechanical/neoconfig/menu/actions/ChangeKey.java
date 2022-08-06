@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.GUIAction;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -9,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +60,12 @@ public class ChangeKey extends GUIAction {
                     return AnvilGUI.Response.close();
                 })
                 .onClose(playerAuthor -> {//called when the inventory is closed
-                    InventoryUtil.openInventory(player, restoreInventory);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            InventoryUtil.openInventory(playerAuthor, restoreInventory);
+                        }
+                    }.runTaskLater(NeoUtils.getInstance(), 1L);
                 })
                 .text(initialKeyValue.toString())                              //sets the text the GUI should start with
                 .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
