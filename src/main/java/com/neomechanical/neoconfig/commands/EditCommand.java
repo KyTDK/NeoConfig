@@ -14,29 +14,25 @@ import org.bukkit.plugin.Plugin;
 import java.util.List;
 import java.util.Map;
 
-public class IndividualPluginCommand extends SubCommand {
-    private final String pluginName;
-    public IndividualPluginCommand(String pluginName) {
-        this.pluginName = pluginName;
-    }
+public class EditCommand extends SubCommand {
     @Override
     public String getName() {
-        return pluginName;
+        return "edit";
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "Edit the config file of a specific plugin";
     }
 
     @Override
     public String getSyntax() {
-        return null;
+        return "/nc edit <plugin name>";
     }
 
     @Override
     public String getPermission() {
-        return "neoconfig.admin";
+        return "neoconfig.edit";
     }
 
     @Override
@@ -50,7 +46,7 @@ public class IndividualPluginCommand extends SubCommand {
         InventoryGUI inventoryGUI;
         Plugin plugin = Bukkit.getPluginManager().getPlugin(args[0]);
         if (plugin == null) {
-            MessageUtil.sendMM(NeoConfig.adventure(), player, "<red><bold>Plugin not found");
+            new MessageUtil(NeoConfig.adventure()).sendMM(player, "<red><bold>Plugin not found");
             return;
         }
         inventoryGUI = ConfigMenu.generateMenu(plugin);

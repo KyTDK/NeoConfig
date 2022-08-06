@@ -75,15 +75,16 @@
                         </relocation>
                         <relocation>
                             <pattern>net.wesjd.anvilgui</pattern>
-                            <shadedPattern>com.neomechanical.neoconfig.anvilgui</shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
+                            <shadedPattern>com.neomechanical.neoconfig.anvilgui
+                            </shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
                         </relocation>
                     </relocations>
                     <minimizeJar>false</minimizeJar> <!-- Ensure not set to true -->
                     <artifactSet>
                         <includes>
                             <include>org.bstats</include>
-                            <!--<include>com.github.KyTDK:NeoUtils</include>-->
-                            <include>com.neomechanical:NeoUtils</include>
+                            <include>com.github.KyTDK:NeoUtils</include>
+                            <!--<include>com.neomechanical:NeoUtils</include>-->
                             <include>net.kyori</include>
                             <include>net.wesjd</include>
                         </includes>
@@ -130,7 +131,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19-R0.1-SNAPSHOT</version>
+            <version>1.19.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -153,9 +154,9 @@
         </dependency>
         <!-- NeoUtils -->
         <dependency>
-            <groupId>com.neomechanical</groupId>
+            <groupId>com.github.KyTDK</groupId>
             <artifactId>NeoUtils</artifactId>
-            <version>6.9</version>
+            <version>1.10.8</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
