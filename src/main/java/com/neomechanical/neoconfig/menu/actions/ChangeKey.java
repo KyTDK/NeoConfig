@@ -24,24 +24,24 @@ public class ChangeKey extends GUIAction {
     private final Plugin pluginInstance;
     private final InventoryGUI restoreInventory;
     private final BiConsumer<Player, String> completeFunction;
-    private final Plugin pluginEditing;
+    private final String perm;
 
     public ChangeKey(String subKey, FileConfiguration config, File file, ConfigurationSection key,
-                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction, Plugin pluginEditing, Plugin pluginInstance) {
+                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction, String perm, Plugin pluginInstance) {
         this.subKey = subKey;
         this.config = config;
         this.key = key;
         this.file = file;
         this.restoreInventory = restoreInventory;
         this.completeFunction = completeFunction;
-        this.pluginEditing = pluginEditing;
+        this.perm = perm;
         this.pluginInstance = pluginInstance;
     }
 
     @Override
     public void action(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (!player.hasPermission("neoconfig.edit." + pluginEditing.getName())) {
+        if (!player.hasPermission(perm)) {
             MessageUtil.sendMM(player, "<red><bold>You do not have permission to edit this plugin");
             return;
         }

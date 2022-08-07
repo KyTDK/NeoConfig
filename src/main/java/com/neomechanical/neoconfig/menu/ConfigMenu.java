@@ -26,6 +26,7 @@ import java.util.function.BiConsumer;
 public class ConfigMenu {
     private final Plugin plugin;
     private BiConsumer<Player, String> completeFunction;
+    private String perm = null;
 
     public ConfigMenu(Plugin plugin) {
         this.plugin = plugin;
@@ -50,9 +51,16 @@ public class ConfigMenu {
         InventoryUtil.registerGUI(menu);
         return menu;
     }
+
     @SuppressWarnings("unused")
     public ConfigMenu onComplete(BiConsumer<Player, String> completeFunction) {
         this.completeFunction = completeFunction;
+        return this;
+    }
+
+    @SuppressWarnings("unused")
+    public ConfigMenu permission(String perm) {
+        this.perm = perm;
         return this;
     }
 
@@ -106,8 +114,11 @@ public class ConfigMenu {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
+            if (perm == null) {
+                perm = "neoconfig.edit." + pluginEditing.getName();
+            }
             InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, pluginEditing, plugin), null);
+                    completeFunction, perm, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
         //Set not to unregister the keyMenu as it opens an anvil that tricks functionality to unregister all
