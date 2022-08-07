@@ -48,8 +48,12 @@ public class EditCommand extends SubCommand {
             MessageUtil.sendMM(player, "<red><bold>Plugin not found");
             return;
         }
-        ConfigMenu configMenu = new ConfigMenu(NeoConfig.getInstance());
-        configMenu.open(playerAsPlayer, plugin);
+        if (player.hasPermission("neoconfig.edit." + plugin.getName())) {
+            new ConfigMenu(NeoConfig.getInstance())
+                    .open(playerAsPlayer, plugin);
+        } else {
+            MessageUtil.sendMM(player, "<red><bold>You do not have permission to edit this plugin");
+        }
     }
 
     @Override

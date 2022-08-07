@@ -73,7 +73,7 @@ public class ConfigMenu {
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
-            addKeys(config, file, keysMenu);
+            addKeys(config, file, keysMenu, plugin);
             InventoryUtil.registerGUI(keysMenu);
             ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
             InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
@@ -82,7 +82,7 @@ public class ConfigMenu {
         return true;
     }
 
-    private void addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu) {
+    private void addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
         ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(config);
         for (ConfigurationSection key : keys) {
             if (key == null) {
@@ -92,7 +92,7 @@ public class ConfigMenu {
             //Create GUI for all the keys
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
             keyMenu.setOpenOnClose(configYMLMenu);
-            addSubKeys(config, file, key, keyMenu);
+            addSubKeys(config, file, key, keyMenu, pluginEditing);
             InventoryUtil.registerGUI(keyMenu);
             InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
             //Add keyMenu item to configYMLMenu
@@ -100,14 +100,14 @@ public class ConfigMenu {
         }
     }
 
-    private void addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu) {
+    private void addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu, Plugin pluginEditing) {
         for (String subKey : key.getKeys(false)) {
             if (subKey == null) {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
             InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, plugin), null);
+                    completeFunction, pluginEditing, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
         //Set not to unregister the keyMenu as it opens an anvil that tricks functionality to unregister all
