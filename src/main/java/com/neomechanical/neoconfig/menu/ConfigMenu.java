@@ -52,13 +52,13 @@ public class ConfigMenu {
         InventoryUtil.registerGUI(menu);
         this.menu = menu;
     }
-
+    @SuppressWarnings("unused")
     public ConfigMenu onComplete(BiConsumer<Player, String> completeFunction) {
         this.completeFunction = completeFunction;
         return this;
     }
 
-    public void open(Player player, Plugin plugin) {
+    public void open(Player player, @Nullable Plugin plugin) {
         generateMenu(plugin);
         if (menu != null) {
             InventoryUtil.openInventory(player, menu);
