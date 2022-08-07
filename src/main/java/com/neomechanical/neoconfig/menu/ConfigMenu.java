@@ -31,16 +31,14 @@ public class ConfigMenu {
         this.plugin = plugin;
     }
 
-    private InventoryGUI menu = null;
-
-    private void generateMenu(@Nullable Plugin plugin) {
+    private InventoryGUI generateMenu(@Nullable Plugin plugin) {
         if (plugin != null) {
             //Create plugin menu with all the keys
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
             if (addFiles(plugin, pluginMenu)) {
                 //Add pluginMenu item to main menu
                 InventoryUtil.registerGUI(pluginMenu);
-                this.menu = pluginMenu;
+                return pluginMenu;
             }
         }
         InventoryGUI menu = InventoryUtil.createInventoryGUI(null, 54, "NeoConfig");
@@ -50,7 +48,7 @@ public class ConfigMenu {
             createPluginItem(p, menu);
         }
         InventoryUtil.registerGUI(menu);
-        this.menu = menu;
+        return menu;
     }
     @SuppressWarnings("unused")
     public ConfigMenu onComplete(BiConsumer<Player, String> completeFunction) {
@@ -59,12 +57,8 @@ public class ConfigMenu {
     }
 
     public void open(Player player, @Nullable Plugin plugin) {
-        generateMenu(plugin);
-        if (menu != null) {
-            InventoryUtil.openInventory(player, menu);
-            return;
-        }
-        throw new IllegalStateException("Menu not generated");
+        InventoryGUI menu = generateMenu(plugin);
+        InventoryUtil.openInventory(player, menu);
     }
 
     //PluginMenu contains all the plugins interface items
