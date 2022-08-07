@@ -2,40 +2,29 @@ package com.neomechanical.neoconfig;
 
 import com.neomechanical.neoconfig.commands.RegisterCommands;
 import com.neomechanical.neoutils.NeoUtils;
-import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.updates.UpdateChecker;
-import lombok.NonNull;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.neomechanical.neoutils.updates.IsUpToDate.isUpToDate;
 
-public final class NeoConfig extends JavaPlugin {
-    private static BukkitAudiences adventure;
+public final class NeoConfig extends NeoUtils {
     private static NeoConfig instance;
+
     private void setInstance(NeoConfig instance) {
         NeoConfig.instance = instance;
     }
+
     public static NeoConfig getInstance() {
         return instance;
     }
-    public static @NonNull BukkitAudiences adventure() {
-        if (adventure == null) {
-            throw new IllegalStateException("Tried to access Adventure when the plugin was disabled!");
-        }
-        return adventure;
-    }
+
     private Metrics metrics;
+
     @Override
-    public void onEnable() {
+    public void onPluginEnable() {
         setInstance(this);
-        // Plugin startup logic
-        adventure = BukkitAudiences.create(this);
-        InventoryUtil.init(NeoConfig.getInstance());
         RegisterCommands.register();
         setupBStats();
-        NeoUtils.init(this);
         new UpdateChecker(this, 104089).getVersion(version -> {
             if (!isUpToDate(this.getDescription().getVersion(), version)) {
                 getLogger().info("NeoConfig v" + version + " is out. Download it at: https://www.spigotmc.org/resources/neoconfig.104089/");
@@ -47,10 +36,12 @@ public final class NeoConfig extends JavaPlugin {
         int pluginId = 16032;
         metrics = new Metrics(this, pluginId);
     }
+
     @Override
-    public void onDisable() {
+    public void onPluginDisable() {
         // Plugin shutdown logic
     }
+
     /**
      * Returns an instance of the bStats Metrics object
      *

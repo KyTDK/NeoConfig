@@ -3,6 +3,7 @@ package com.neomechanical.neoconfig.menu.actions;
 import com.neomechanical.neoutils.inventory.GUIAction;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
+import com.neomechanical.neoutils.messages.MessageUtil;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -40,6 +41,10 @@ public class ChangeKey extends GUIAction {
     @Override
     public void action(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
+        if (initialKeyValue.toString().length() > 50) {
+            MessageUtil.sendMM(player, "<red><bold>Key value is too long.");
+            return;
+        }
         new AnvilGUI.Builder()
                 .onComplete((playerAuthor, text) -> {                                    //called when the inventory output slot is clicked
                     if (initialKeyValue instanceof String) {
