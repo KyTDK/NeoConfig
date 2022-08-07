@@ -110,6 +110,8 @@ public class ConfigMenu {
                     completeFunction, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
+        //Set not to unregister the keyMenu as it opens an anvil that tricks functionality to unregister all
+        keyMenu.setUnregisterOnClose(false);
     }
 
     private void createPluginItem(Plugin p, InventoryGUI menu) {
