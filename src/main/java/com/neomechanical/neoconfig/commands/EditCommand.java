@@ -3,8 +3,6 @@ package com.neomechanical.neoconfig.commands;
 import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoconfig.menu.ConfigMenu;
 import com.neomechanical.neoutils.commandManager.SubCommand;
-import com.neomechanical.neoutils.inventory.InventoryUtil;
-import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -45,14 +43,13 @@ public class EditCommand extends SubCommand {
     @Override
     public void perform(CommandSender player, String[] args) {
         Player playerAsPlayer = (Player) player;
-        InventoryGUI inventoryGUI;
         Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);
         if (plugin == null) {
             MessageUtil.sendMM(player, "<red><bold>Plugin not found");
             return;
         }
-        inventoryGUI = new ConfigMenu(NeoConfig.getInstance()).generateMenu(plugin);
-        InventoryUtil.openInventory(playerAsPlayer, inventoryGUI);
+        ConfigMenu configMenu = new ConfigMenu(NeoConfig.getInstance());
+        configMenu.open(playerAsPlayer, plugin);
     }
 
     @Override

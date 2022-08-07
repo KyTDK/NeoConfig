@@ -1,6 +1,5 @@
 package com.neomechanical.neoconfig.menu.actions;
 
-import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.GUIAction;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -14,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.BiConsumer;
 
 public class ChangeKey extends GUIAction {
     private final Object initialKeyValue;
@@ -23,15 +23,17 @@ public class ChangeKey extends GUIAction {
     private final FileConfiguration config;
     private final Plugin plugin;
     private final InventoryGUI restoreInventory;
+    private final BiConsumer<Player, String> completeFunction;
 
     public ChangeKey(Object initialKeyValue, String subKey, FileConfiguration config, File file, ConfigurationSection key,
-                     InventoryGUI restoreInventory, Plugin plugin) {
+                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction, Plugin plugin) {
         this.initialKeyValue = initialKeyValue;
         this.subKey = subKey;
         this.config = config;
         this.key = key;
         this.file = file;
         this.restoreInventory = restoreInventory;
+        this.completeFunction = completeFunction;
         this.plugin = plugin;
     }
 
@@ -56,7 +58,10 @@ public class ChangeKey extends GUIAction {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                    InventoryUtil.openInventory(player, restoreInventory);
+                    if (completeFunction != null) {
+                        completeFunction.accept(player, text);
+                    }
+                    InventoryUtil.openInventory(playerAuthor, restoreInventory);
                     return AnvilGUI.Response.close();
                 })
                 .onClose(playerAuthor -> {//called when the inventory is closed
@@ -65,7 +70,7 @@ public class ChangeKey extends GUIAction {
                         public void run() {
                             InventoryUtil.openInventory(playerAuthor, restoreInventory);
                         }
-                    }.runTaskLater(NeoUtils.getInstance(), 1L);
+                    }.runTaskLater(plugin, 1L);
                 })
                 .text(initialKeyValue.toString())                              //sets the text the GUI should start with
                 .title("Change key")                                       //set the title of the GUI (only works in 1.14+)

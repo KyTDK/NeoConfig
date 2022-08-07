@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
@@ -20,22 +21,26 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class ConfigMenu {
     private final Plugin plugin;
+    private BiConsumer<Player, String> completeFunction;
 
     public ConfigMenu(Plugin plugin) {
         this.plugin = plugin;
     }
 
-    public InventoryGUI generateMenu(@Nullable Plugin plugin) {
+    private InventoryGUI menu = null;
+
+    private void generateMenu(@Nullable Plugin plugin) {
         if (plugin != null) {
             //Create plugin menu with all the keys
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
             if (addFiles(plugin, pluginMenu)) {
                 //Add pluginMenu item to main menu
                 InventoryUtil.registerGUI(pluginMenu);
-                return pluginMenu;
+                this.menu = pluginMenu;
             }
         }
         InventoryGUI menu = InventoryUtil.createInventoryGUI(null, 54, "NeoConfig");
@@ -45,7 +50,21 @@ public class ConfigMenu {
             createPluginItem(p, menu);
         }
         InventoryUtil.registerGUI(menu);
-        return menu;
+        this.menu = menu;
+    }
+
+    public ConfigMenu onComplete(BiConsumer<Player, String> completeFunction) {
+        this.completeFunction = completeFunction;
+        return this;
+    }
+
+    public void open(Player player, Plugin plugin) {
+        generateMenu(plugin);
+        if (menu != null) {
+            InventoryUtil.openInventory(player, menu);
+            return;
+        }
+        throw new IllegalStateException("Menu not generated");
     }
 
     //PluginMenu contains all the plugins interface items
@@ -93,7 +112,8 @@ public class ConfigMenu {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
-            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key, keyMenu, plugin), null);
+            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key, keyMenu,
+                    completeFunction, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
     }
