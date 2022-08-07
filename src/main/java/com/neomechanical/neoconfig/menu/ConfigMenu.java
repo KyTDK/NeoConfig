@@ -106,7 +106,7 @@ public class ConfigMenu {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
-            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(key.get(subKey), subKey, config, file, key, keyMenu,
+            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(subKey, config, file, key, keyMenu,
                     completeFunction, plugin), null);
             keyMenu.addItem(inventoryItem);
         }

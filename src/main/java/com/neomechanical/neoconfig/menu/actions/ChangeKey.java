@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.function.BiConsumer;
 
 public class ChangeKey extends GUIAction {
-    private final Object initialKeyValue;
     private final ConfigurationSection key;
     private final String subKey;
     private final File file;
@@ -26,9 +25,8 @@ public class ChangeKey extends GUIAction {
     private final InventoryGUI restoreInventory;
     private final BiConsumer<Player, String> completeFunction;
 
-    public ChangeKey(Object initialKeyValue, String subKey, FileConfiguration config, File file, ConfigurationSection key,
+    public ChangeKey(String subKey, FileConfiguration config, File file, ConfigurationSection key,
                      InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction, Plugin plugin) {
-        this.initialKeyValue = initialKeyValue;
         this.subKey = subKey;
         this.config = config;
         this.key = key;
@@ -41,6 +39,10 @@ public class ChangeKey extends GUIAction {
     @Override
     public void action(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
+        Object initialKeyValue = key.get(subKey);
+        if (initialKeyValue == null) {
+            throw new IllegalArgumentException("Key " + subKey + " does not exist in " + file.getName());
+        }
         if (initialKeyValue.toString().length() > 50) {
             MessageUtil.sendMM(player, "<red><bold>Key value is too long.");
             return;
