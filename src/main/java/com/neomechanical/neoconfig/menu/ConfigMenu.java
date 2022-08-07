@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public class ConfigMenu {
@@ -114,11 +115,9 @@ public class ConfigMenu {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
-            if (perm == null) {
-                perm = "neoconfig.edit." + pluginEditing.getName();
-            }
+            String perm2 = Objects.requireNonNullElseGet(perm, () -> "neoconfig.edit." + pluginEditing.getName());
             InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, perm, plugin), null);
+                    completeFunction, perm2, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
         //Set not to unregister the keyMenu as it opens an anvil that tricks functionality to unregister all
