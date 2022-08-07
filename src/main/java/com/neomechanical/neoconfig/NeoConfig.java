@@ -3,10 +3,13 @@ package com.neomechanical.neoconfig;
 import com.neomechanical.neoconfig.commands.RegisterCommands;
 import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
+import com.neomechanical.neoutils.updates.UpdateChecker;
 import lombok.NonNull;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import static com.neomechanical.neoutils.updates.IsUpToDate.isUpToDate;
 
 public final class NeoConfig extends JavaPlugin {
     private static BukkitAudiences adventure;
@@ -33,6 +36,11 @@ public final class NeoConfig extends JavaPlugin {
         RegisterCommands.register();
         setupBStats();
         NeoUtils.init(this);
+        new UpdateChecker(this, 104089).getVersion(version -> {
+            if (!isUpToDate(this.getDescription().getVersion(), version)) {
+                getLogger().info("NeoConfig v" + version + " is out. Download it at: https://www.spigotmc.org/resources/neoconfig.104089/");
+            }
+        });
     }
 
     public void setupBStats() {
