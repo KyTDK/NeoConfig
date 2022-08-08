@@ -2,6 +2,7 @@ package com.neomechanical.neoconfig;
 
 import com.neomechanical.neoconfig.commands.RegisterCommands;
 import com.neomechanical.neoutils.NeoUtils;
+import com.neomechanical.neoutils.languages.LanguageManager;
 import com.neomechanical.neoutils.updates.UpdateChecker;
 import org.bstats.bukkit.Metrics;
 
@@ -23,6 +24,8 @@ public final class NeoConfig extends NeoUtils {
     @Override
     public void onPluginEnable() {
         setInstance(this);
+        //Set language manager before majority as they depend on its messages.
+        new LanguageManager(this, "en_US.yml");
         RegisterCommands.register();
         setupBStats();
         new UpdateChecker(this, 104089).getVersion(version -> {

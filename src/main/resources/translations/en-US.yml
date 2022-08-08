@@ -1,0 +1,9 @@
+commandGeneric:
+  errorPlayerNotFound: '<red><bold>Player not found'
+  errorInvalidSyntax: '<red><bold>Invalid syntax - type "/np help" for help'
+  errorWorldNotFound: '<red><bold>World not found'
+  errorNoPermission: '<red><bold>You do not have permission to use this command'
+  errorNotPlayer: '<red><bold>This command is for players only'
+  errorCommandNotFound: '<red><bold>Command not found, try /np help'
+reload:
+  onReload: '<green><bold>Config file reloaded'
