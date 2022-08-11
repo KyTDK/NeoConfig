@@ -83,8 +83,8 @@
                     <artifactSet>
                         <includes>
                             <include>org.bstats</include>
-                            <!--<include>com.github.KyTDK:NeoUtils</include>-->
-                            <include>com.neomechanical:NeoUtils</include>
+                            <include>com.github.KyTDK:NeoUtils</include>
+                            <!--<include>com.neomechanical:NeoUtils</include>-->
                             <include>net.wesjd</include>
                         </includes>
                     </artifactSet>
