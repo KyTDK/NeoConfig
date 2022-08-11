@@ -25,7 +25,10 @@ public final class NeoConfig extends NeoUtils {
     public void onPluginEnable() {
         setInstance(this);
         //Set language manager before majority as they depend on its messages.
-        new LanguageManager(this, "en_US.yml");
+        new LanguageManager(this)
+                .setLanguageCode("en-US")
+                .setLanguageFile("en-US.yml")
+                .set();
         RegisterCommands.register();
         setupBStats();
         new UpdateChecker(this, 104089).getVersion(version -> {

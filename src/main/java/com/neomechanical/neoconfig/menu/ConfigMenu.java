@@ -39,7 +39,6 @@ public class ConfigMenu {
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
             if (addFiles(plugin, pluginMenu)) {
                 //Add pluginMenu item to main menu
-                InventoryUtil.registerGUI(pluginMenu);
                 return pluginMenu;
             }
         }
@@ -49,7 +48,6 @@ public class ConfigMenu {
         for (Plugin p : plugins) {
             createPluginItem(p, menu);
         }
-        InventoryUtil.registerGUI(menu);
         return menu;
     }
 
@@ -83,7 +81,6 @@ public class ConfigMenu {
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
             addKeys(config, file, keysMenu, plugin);
-            InventoryUtil.registerGUI(keysMenu);
             ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
             InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
             pluginMenu.addItem(ymlFile);
@@ -102,7 +99,6 @@ public class ConfigMenu {
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
             keyMenu.setOpenOnClose(configYMLMenu);
             addSubKeys(config, file, key, keyMenu, pluginEditing);
-            InventoryUtil.registerGUI(keyMenu);
             InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
             //Add keyMenu item to configYMLMenu
             configYMLMenu.addItem(inventoryItem);
@@ -135,6 +131,5 @@ public class ConfigMenu {
             menu.addItem(inventoryItem);
         }
         pluginMenu.setOpenOnClose(menu);
-        InventoryUtil.registerGUI(pluginMenu);
     }
 }
