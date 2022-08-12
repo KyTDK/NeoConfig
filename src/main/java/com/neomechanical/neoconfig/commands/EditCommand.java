@@ -2,6 +2,7 @@ package com.neomechanical.neoconfig.commands;
 
 import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoconfig.menu.ConfigMenu;
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.commandManager.SubCommand;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import org.bukkit.Bukkit;
@@ -45,14 +46,14 @@ public class EditCommand extends SubCommand {
         Player playerAsPlayer = (Player) player;
         Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);
         if (plugin == null) {
-            MessageUtil.sendMM(player, "<red><bold>Plugin not found");
+            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorNotPlayer", null));
             return;
         }
         if (player.hasPermission("neoconfig.edit." + plugin.getName())) {
             new ConfigMenu(NeoConfig.getInstance())
                     .open(playerAsPlayer, plugin);
         } else {
-            MessageUtil.sendMM(player, "<red><bold>You do not have permission to edit this plugin");
+            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null));
         }
     }
 

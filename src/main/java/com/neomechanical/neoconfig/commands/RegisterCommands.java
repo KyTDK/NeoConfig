@@ -15,5 +15,6 @@ public class RegisterCommands {
         commandManager.registerMainCommand(new MainCommand());
         commandManager.registerSubCommand(new EditCommand());
         commandManager.registerSubCommand(new HelpCommand(commandManager));
+        commandManager.registerSubCommand(new ReloadCommand());
     }
 }
