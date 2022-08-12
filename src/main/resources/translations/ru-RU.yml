@@ -1,0 +1,10 @@
+#команды
+commandGeneric:
+  errorPlayerNotFound: '<red><bold>Игрок не найден'
+  errorInvalidSyntax: '<red><bold>Неверный аргумент - напишите "/nc help" для помощи'
+  errorWorldNotFound: '<red><bold>Мир не найден'
+  errorNoPermission: '<red><bold>У вас нет разрешения на использование этой команды'
+  errorNotPlayer: '<red><bold>Эта команда только для игроков'
+  errorCommandNotFound: '<red><bold>Команда не найдена, попробуйте /nc help'
+reload:
+  onReload: '<green><bold>Конфиг перезагружен'

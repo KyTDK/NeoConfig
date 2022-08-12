@@ -27,7 +27,7 @@ public final class NeoConfig extends NeoUtils {
         //Set language manager before majority as they depend on its messages.
         new LanguageManager(this)
                 .setLanguageCode("en-US")
-                .setLanguageFile("en-US.yml")
+                .setLanguageFile("en-US.yml", "es-ES.yml", "fr-FR.yml", "ru-RU.yml", "tr-TR.yml", "zh-CN-yml")
                 .set();
         RegisterCommands.register();
         setupBStats();

@@ -1,0 +1,10 @@
+# Comandos
+commandGeneric:
+  errorPlayerNotFound: '<red><bold>Jugador no encontrado'
+  errorInvalidSyntax: '<red><bold>Sintaxis no válida: escribe "/nc help" para obtener ayuda.'
+  errorWorldNotFound: '<red><bold>Mundo no encontrado.'
+  errorNoPermission: '<red><bold>No tienes permisos para usar ese comando.'
+  errorNotPlayer: '<red><bold>Este comando es solo para jugadores.'
+  errorCommandNotFound: '<red><bold>Comando no encontrado, intente /nc help'
+reload:
+  onReload: '<green><bold>Archivo de configuración recargado'

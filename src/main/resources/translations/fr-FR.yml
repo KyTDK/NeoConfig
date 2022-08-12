@@ -1,0 +1,13 @@
+#commandes
+commandGeneric:
+  errorPlayerNotFound: '<red><bold>Joueur introuvable'
+  errorInvalidSyntax: "<red><bold>Syntaxe non valide - tapez '/nc help' pour obtenir de l'aide"
+  errorWorldNotFound: '<red><bold>Monde introuvable'
+  errorNoPermission: "<red><bold>Vous n'êtes pas autorisé à utiliser cette commande"
+  errorNotPlayer: '<red><bold>Cette commande est réservée aux joueurs'
+  errorCommandNotFound: '<red><bold>Commande introuvable, essayez /nc help'
+halt:
+  toggleHaltOn: '<red><bold>Le serveur a été arrêté'
+  toggleHaltOff: '<green><bold>Le serveur a été repris'
+reload:
+  onReload: '<green><bold>Fichier de configuration rechargé'

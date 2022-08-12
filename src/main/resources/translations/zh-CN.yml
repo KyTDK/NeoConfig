@@ -1,0 +1,10 @@
+  #命令
+commandGeneric:
+  errorPlayerNotFound: '<red><bold>玩家未找到'
+  errorInvalidSyntax: '<red><bold>无效语法 - 键入“/nc help”以获得帮助'
+  errorWorldNotFound: '<red><bold>未找到世界'
+  errorNoPermission: '<red><bold>您没有使用此命令的权限'
+  errorNotPlayer: '<red><bold>此命令仅供玩家使用'
+  errorCommandNotFound: '<red><bold>找不到命令，尝试 /nc help'
+reload:
+  onReload: '<green><bold>重新加载配置文件'
