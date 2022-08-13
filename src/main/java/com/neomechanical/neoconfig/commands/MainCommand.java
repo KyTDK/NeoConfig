@@ -40,7 +40,7 @@ public class MainCommand extends Command {
     public void perform(CommandSender player, String[] args) {
         Player playerAsPlayer = (Player) player;
         new ConfigMenu(NeoConfig.getInstance())
-                .permission("neoconfig.admin",
+                .permission(null,
                         () -> NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null))
                 .open(playerAsPlayer, null);
     }
