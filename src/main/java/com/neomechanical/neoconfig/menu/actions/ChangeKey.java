@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.GUIAction;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -42,7 +43,7 @@ public class ChangeKey extends GUIAction {
     public void action(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (!player.hasPermission(perm)) {
-            MessageUtil.sendMM(player, "<red><bold>You do not have permission to edit this plugin");
+            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null));
             return;
         }
         Object initialKeyValue = key.get(subKey);
