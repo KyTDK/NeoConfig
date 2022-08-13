@@ -39,7 +39,7 @@ public class ConfigMenu {
         if (plugin != null) {
             //Create plugin menu with all the keys
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
-            if (addFiles(plugin, pluginMenu)) {
+            if (addFiles(plugin, pluginMenu, plugin.getDataFolder().listFiles())) {
                 //Add pluginMenu item to main menu
                 return pluginMenu;
             }
@@ -72,12 +72,26 @@ public class ConfigMenu {
     }
 
     //PluginMenu contains all the plugins interface items
-    private boolean addFiles(Plugin plugin, InventoryGUI pluginMenu) {
-        File[] dataFolder = plugin.getDataFolder().listFiles((directory, fileName) -> fileName.endsWith(".yml"));
+    private boolean addFiles(Plugin plugin, InventoryGUI pluginMenu, File[] dataFolder) {
         if (dataFolder == null) {
             return false;
         }
         for (File file : dataFolder) {
+            // Add all yml files in the data folder that are directories
+            if (file.isDirectory()) {
+                InventoryGUI directory = InventoryUtil.createInventoryGUI(null, 54, file.getName());
+                addFiles(plugin, directory, file.listFiles());
+                pluginMenu.addItem(new InventoryItem(ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()),
+                        new OpenInventory(directory), null));
+            }
+            // Add all yml files inside the plugin data folder (excluding directories)
+            addFile(file, pluginMenu);
+        }
+        return true;
+    }
+
+    private void addFile(File file, InventoryGUI pluginMenu) {
+        if (file.getName().endsWith(".yml")) {
             FileConfiguration config = YamlConfiguration.loadConfiguration(file);
             //Create YML item with all keys
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
@@ -88,7 +102,6 @@ public class ConfigMenu {
             InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
             pluginMenu.addItem(ymlFile);
         }
-        return true;
     }
 
     private void addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
@@ -128,7 +141,7 @@ public class ConfigMenu {
 
         //Create plugin menu with all the keys
         InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
-        if (addFiles(p, pluginMenu)) {
+        if (addFiles(p, pluginMenu, plugin.getDataFolder().listFiles())) {
             //Add pluginMenu item to main menu
             InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
             menu.addItem(inventoryItem);
