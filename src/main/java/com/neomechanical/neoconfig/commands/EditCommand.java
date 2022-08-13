@@ -55,6 +55,8 @@ public class EditCommand extends SubCommand {
         }
         if (player.hasPermission("neoconfig.edit." + plugin.getName())) {
             new ConfigMenu(NeoConfig.getInstance())
+                    .permission("neoconfig.edit." + plugin.getName(),
+                            () -> NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null))
                     .open(playerAsPlayer, plugin);
         } else {
             MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null));

@@ -23,11 +23,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public class ConfigMenu {
     private final Plugin plugin;
     private BiConsumer<Player, String> completeFunction;
     private String perm = null;
+    private Supplier<String> permMessage = () -> "<red><bold>You do not have permission to use this command";
 
     public ConfigMenu(Plugin plugin) {
         this.plugin = plugin;
@@ -58,8 +60,9 @@ public class ConfigMenu {
     }
 
     @SuppressWarnings("unused")
-    public ConfigMenu permission(String perm) {
+    public ConfigMenu permission(String perm, Supplier<String> permMessage) {
         this.perm = perm;
+        this.permMessage = permMessage;
         return this;
     }
 
@@ -113,7 +116,7 @@ public class ConfigMenu {
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
             String perm2 = Objects.requireNonNullElseGet(perm, () -> "neoconfig.edit." + pluginEditing.getName());
             InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, perm2, plugin), null);
+                    completeFunction, perm2, permMessage, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
         //Set not to unregister the keyMenu as it opens an anvil that tricks functionality to unregister all

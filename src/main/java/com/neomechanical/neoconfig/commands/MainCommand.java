@@ -2,6 +2,7 @@ package com.neomechanical.neoconfig.commands;
 
 import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoconfig.menu.ConfigMenu;
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.commandManager.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -38,7 +39,10 @@ public class MainCommand extends Command {
     @Override
     public void perform(CommandSender player, String[] args) {
         Player playerAsPlayer = (Player) player;
-        new ConfigMenu(NeoConfig.getInstance()).open(playerAsPlayer, null);
+        new ConfigMenu(NeoConfig.getInstance())
+                .permission("neoconfig.admin",
+                        () -> NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null))
+                .open(playerAsPlayer, null);
     }
 
     @Override

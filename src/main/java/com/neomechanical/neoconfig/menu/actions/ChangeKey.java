@@ -1,6 +1,5 @@
 package com.neomechanical.neoconfig.menu.actions;
 
-import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.GUIAction;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -16,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public class ChangeKey extends GUIAction {
     private final ConfigurationSection key;
@@ -26,9 +26,10 @@ public class ChangeKey extends GUIAction {
     private final InventoryGUI restoreInventory;
     private final BiConsumer<Player, String> completeFunction;
     private final String perm;
+    private final Supplier<String> permMessage;
 
     public ChangeKey(String subKey, FileConfiguration config, File file, ConfigurationSection key,
-                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction, String perm, Plugin pluginInstance) {
+                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction, String perm, Supplier<String> permMessage, Plugin pluginInstance) {
         this.subKey = subKey;
         this.config = config;
         this.key = key;
@@ -36,6 +37,7 @@ public class ChangeKey extends GUIAction {
         this.restoreInventory = restoreInventory;
         this.completeFunction = completeFunction;
         this.perm = perm;
+        this.permMessage = permMessage;
         this.pluginInstance = pluginInstance;
     }
 
@@ -43,7 +45,7 @@ public class ChangeKey extends GUIAction {
     public void action(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (!player.hasPermission(perm)) {
-            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null));
+            MessageUtil.sendMM(player, permMessage.get());
             return;
         }
         Object initialKeyValue = key.get(subKey);
