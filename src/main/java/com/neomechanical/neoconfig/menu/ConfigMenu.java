@@ -39,7 +39,7 @@ public class ConfigMenu {
         if (plugin != null) {
             //Create plugin menu with all the keys
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
-            if (addFiles(plugin, pluginMenu, plugin.getDataFolder().listFiles())) {
+            if (addFiles(pluginMenu, plugin.getDataFolder().listFiles())) {
                 //Add pluginMenu item to main menu
                 return pluginMenu;
             }
@@ -52,7 +52,6 @@ public class ConfigMenu {
         }
         return menu;
     }
-
     @SuppressWarnings("unused")
     public ConfigMenu onComplete(BiConsumer<Player, String> completeFunction) {
         this.completeFunction = completeFunction;
@@ -71,18 +70,38 @@ public class ConfigMenu {
         InventoryUtil.openInventory(player, menu);
     }
 
+    private void createPluginItem(Plugin p, InventoryGUI menu) {
+        ItemStack item = ItemUtil.createItem(Material.BOOKSHELF, ChatColor.RESET + p.getName());
+
+        //Create plugin menu with all the keys
+        InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
+        if (addFiles(pluginMenu, p.getDataFolder().listFiles())) {
+            //Add pluginMenu item to main menu
+            InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
+            menu.addItem(inventoryItem);
+        }
+        pluginMenu.setOpenOnClose(menu);
+    }
+
     //PluginMenu contains all the plugins interface items
-    private boolean addFiles(Plugin plugin, InventoryGUI pluginMenu, File[] dataFolder) {
+    private boolean addFiles(InventoryGUI pluginMenu, File[] dataFolder) {
         if (dataFolder == null) {
             return false;
         }
         for (File file : dataFolder) {
             // Add all yml files in the data folder that are directories
             if (file.isDirectory()) {
+                File[] dirFiles = file.listFiles();
+                File[] ymlFiles = file.listFiles((dir, name) -> name.endsWith(".yml"));
+                if (ymlFiles != null && ymlFiles.length == 0) {
+                    continue;
+                }
                 InventoryGUI directory = InventoryUtil.createInventoryGUI(null, 54, file.getName());
-                addFiles(plugin, directory, file.listFiles());
+                directory.setOpenOnClose(pluginMenu);
+                addFiles(directory, dirFiles);
                 pluginMenu.addItem(new InventoryItem(ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()),
                         new OpenInventory(directory), null));
+                continue;
             }
             // Add all yml files inside the plugin data folder (excluding directories)
             addFile(file, pluginMenu);
@@ -97,31 +116,41 @@ public class ConfigMenu {
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
-            addKeys(config, file, keysMenu, plugin);
-            ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
-            InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
-            pluginMenu.addItem(ymlFile);
+            if (addKeys(config, file, keysMenu, plugin)) {
+                ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
+                InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
+                pluginMenu.addItem(ymlFile);
+            }
+            addSubKeys(config, file, config, keysMenu, plugin);
         }
     }
 
-    private void addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
+    private boolean addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
         ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(config);
+        if (config.getKeys(false).isEmpty()) {
+            return false;
+        }
         for (ConfigurationSection key : keys) {
-            if (key == null) {
+            if (key == null || key.getKeys(false).isEmpty()) {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET + key.getName());
             //Create GUI for all the keys
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
             keyMenu.setOpenOnClose(configYMLMenu);
-            addSubKeys(config, file, key, keyMenu, pluginEditing);
-            InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
-            //Add keyMenu item to configYMLMenu
-            configYMLMenu.addItem(inventoryItem);
+            if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
+                InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
+                //Add keyMenu item to configYMLMenu
+                configYMLMenu.addItem(inventoryItem);
+            }
         }
+        return true;
     }
 
-    private void addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu, Plugin pluginEditing) {
+    private boolean addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu, Plugin pluginEditing) {
+        if (key.getKeys(false).isEmpty()) {
+            return false;
+        }
         for (String subKey : key.getKeys(false)) {
             if (subKey == null) {
                 continue;
@@ -132,20 +161,6 @@ public class ConfigMenu {
                     completeFunction, perm2, permMessage, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
-        //Set not to unregister the keyMenu as it opens an anvil that tricks functionality to unregister all
-        keyMenu.setUnregisterOnClose(false);
-    }
-
-    private void createPluginItem(Plugin p, InventoryGUI menu) {
-        ItemStack item = ItemUtil.createItem(Material.BOOKSHELF, ChatColor.RESET + p.getName());
-
-        //Create plugin menu with all the keys
-        InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
-        if (addFiles(p, pluginMenu, plugin.getDataFolder().listFiles())) {
-            //Add pluginMenu item to main menu
-            InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
-            menu.addItem(inventoryItem);
-        }
-        pluginMenu.setOpenOnClose(menu);
+        return true;
     }
 }
