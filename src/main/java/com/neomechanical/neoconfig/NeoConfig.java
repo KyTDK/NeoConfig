@@ -2,6 +2,7 @@ package com.neomechanical.neoconfig;
 
 import com.neomechanical.neoconfig.commands.RegisterCommands;
 import com.neomechanical.neoutils.NeoUtils;
+import com.neomechanical.neoutils.config.ConfigManager;
 import com.neomechanical.neoutils.languages.LanguageManager;
 import com.neomechanical.neoutils.updates.UpdateChecker;
 import org.bstats.bukkit.Metrics;
@@ -21,14 +22,18 @@ public final class NeoConfig extends NeoUtils {
 
     private Metrics metrics;
 
+    public static void reload() {
+        ConfigManager.reloadAllConfigs();
+        NeoUtils.getLanguageManager().loadLanguageConfig();
+    }
+
     @Override
     public void onPluginEnable() {
         setInstance(this);
-        //Set language manager before majority as they depend on its messages.
-        new LanguageManager(this)
-                .setLanguageCode("en-US")
-                .setLanguageFile("en-US.yml", "es-ES.yml", "fr-FR.yml", "ru-RU.yml", "tr-TR.yml", "zh-CN-yml")
-                .set();
+        // Create config
+        new ConfigManager("config.yml");
+        // Create language manager
+        setLanguageManager();
         RegisterCommands.register();
         setupBStats();
         new UpdateChecker(this, 104089).getVersion(version -> {
@@ -56,5 +61,13 @@ public final class NeoConfig extends NeoUtils {
     @SuppressWarnings("unused")
     public Metrics getMetrics() {
         return metrics;
+    }
+
+    private void setLanguageManager() {
+        //Set language manager before majority as they depend on its messages.
+        new LanguageManager(this)
+                .setLanguageCode(() -> NeoUtils.getConfigManager("config.yml").getConfig().getString("visual.language"))
+                .setLanguageFile("en-US.yml", "es-ES.yml", "fr-FR.yml", "ru-RU.yml", "tr-TR.yml", "zh-CN-yml")
+                .set();
     }
 }

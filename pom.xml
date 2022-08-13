@@ -83,8 +83,8 @@
                     <artifactSet>
                         <includes>
                             <include>org.bstats</include>
-                            <include>com.github.KyTDK:NeoUtils</include>
-                            <!--<include>com.neomechanical:NeoUtils</include>-->
+                            <!--<include>com.github.KyTDK:NeoUtils</include>-->
+                            <include>com.neomechanical:NeoUtils</include>
                             <include>net.wesjd</include>
                         </includes>
                     </artifactSet>
@@ -120,17 +120,14 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>codemc-snapshots</id>
-            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
-        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <artifactId>spigot</artifactId>
             <version>1.19.2-R0.1-SNAPSHOT</version>
+            <classifier>remapped-mojang</classifier>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -153,9 +150,9 @@
         </dependency>
         <!-- NeoUtils -->
         <dependency>
-            <groupId>com.github.KyTDK</groupId>
+            <groupId>com.neomechanical</groupId>
             <artifactId>NeoUtils</artifactId>
-            <version>1.11.8</version>
+            <version>6.9</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

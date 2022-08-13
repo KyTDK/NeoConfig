@@ -44,9 +44,13 @@ public class EditCommand extends SubCommand {
     @Override
     public void perform(CommandSender player, String[] args) {
         Player playerAsPlayer = (Player) player;
+        if (args.length == 1) {
+            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorInvalidSyntax", null));
+            return;
+        }
         Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);
         if (plugin == null) {
-            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorNotPlayer", null));
+            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorInvalidSyntax", null));
             return;
         }
         if (player.hasPermission("neoconfig.edit." + plugin.getName())) {

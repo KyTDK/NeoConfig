@@ -1,44 +1,47 @@
 package com.neomechanical.neoconfig.commands;
 
 import com.neomechanical.neoconfig.NeoConfig;
-import com.neomechanical.neoutils.NeoUtils;
+import com.neomechanical.neoconfig.menu.ConfigMenu;
 import com.neomechanical.neoutils.commandManager.SubCommand;
-import com.neomechanical.neoutils.messages.MessageUtil;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
 
-public class ReloadCommand extends SubCommand {
+public class ConfigCommand extends SubCommand {
     @Override
     public String getName() {
-        return "reload";
+        return "config";
     }
 
     @Override
     public String getDescription() {
-        return "Reload the plugin's config file";
+        return "Show the config file in an interactive GUI (Auto reloads config)";
     }
 
     @Override
     public String getSyntax() {
-        return "/np reload";
+        return "/nc config";
     }
 
     @Override
     public String getPermission() {
-        return "neoconfig.reload";
+        return "neoconfig.config";
     }
 
     @Override
     public boolean playerOnly() {
-        return false;
+        return true;
     }
 
     @Override
-    public void perform(CommandSender commandSender, String[] strings) {
-        NeoConfig.reload();
-        MessageUtil.sendMM(commandSender, NeoUtils.getLanguageManager().getString("reload.onReload", null));
+    public void perform(CommandSender player, String[] args) {
+        Player playerAsPlayer = (Player) player;
+        ConfigMenu configMenu = new ConfigMenu(NeoConfig.getInstance());
+        configMenu.onComplete((playerAsAuthor, text) -> NeoConfig.reload())
+                .permission("neoconfig.config")
+                .open(playerAsPlayer, NeoConfig.getInstance());
     }
 
     @Override
