@@ -6,7 +6,7 @@
 
     <groupId>com.neomechanical</groupId>
     <artifactId>NeoConfig</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <packaging>jar</packaging>
 
     <name>NeoConfig</name>
@@ -156,7 +156,7 @@
         <dependency>
             <groupId>com.github.KyTDK</groupId>
             <artifactId>NeoUtils</artifactId>
-            <version>1.12.4</version>
+            <version>1.12.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
