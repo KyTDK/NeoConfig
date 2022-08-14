@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -116,18 +117,19 @@ public class ConfigMenu {
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
-            if (addKeys(config, file, keysMenu, plugin)) {
+            if (addKeys(config, config, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
                 InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
                 pluginMenu.addItem(ymlFile);
             }
+            // Add YAML fields
             addSubKeys(config, file, config, keysMenu, plugin);
         }
     }
 
-    private boolean addKeys(FileConfiguration config, File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
-        ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(config);
-        if (config.getKeys(false).isEmpty()) {
+    private boolean addKeys(FileConfiguration config, ConfigurationSection configurationSection, File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
+        ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(configurationSection);
+        if (configurationSection.getKeys(false).isEmpty()) {
             return false;
         }
         for (ConfigurationSection key : keys) {
@@ -148,11 +150,14 @@ public class ConfigMenu {
     }
 
     private boolean addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu, Plugin pluginEditing) {
-        if (key.getKeys(false).isEmpty()) {
+        Set<String> keys = key.getKeys(false);
+        if (keys.isEmpty()) {
             return false;
         }
-        for (String subKey : key.getKeys(false)) {
-            if (subKey == null) {
+        for (String subKey : keys) {
+            ConfigurationSection section = key.getConfigurationSection(subKey);
+            if (key.isConfigurationSection(subKey) && section != null) {
+                addKeys(config, section, file, keyMenu, pluginEditing);
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);

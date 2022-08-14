@@ -77,7 +77,6 @@ public class ChangeKey extends GUIAction {
                     if (completeFunction != null) {
                         completeFunction.accept(player, text);
                     }
-                    InventoryUtil.openInventory(playerAuthor, restoreInventory);
                     return AnvilGUI.Response.close();
                 })
                 .onClose(playerAuthor -> {//called when the inventory is closed
