@@ -24,13 +24,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ConfigMenu {
     private final Plugin plugin;
     private BiConsumer<Player, String> completeFunction;
     private String perm = null;
+    private String title = "Change key";
     private Supplier<String> permMessage = () -> "<red><bold>You do not have permission to use this command";
+    private Consumer<Player> closeFunction;
 
     public ConfigMenu(Plugin plugin) {
         this.plugin = plugin;
@@ -53,9 +56,20 @@ public class ConfigMenu {
         }
         return menu;
     }
+
     @SuppressWarnings("unused")
     public ConfigMenu onComplete(BiConsumer<Player, String> completeFunction) {
         this.completeFunction = completeFunction;
+        return this;
+    }
+
+    public ConfigMenu onClose(Consumer<Player> closeFunction) {
+        this.closeFunction = closeFunction;
+        return this;
+    }
+
+    public ConfigMenu title(String title) {
+        this.title = title;
         return this;
     }
 
@@ -127,7 +141,8 @@ public class ConfigMenu {
         }
     }
 
-    private boolean addKeys(FileConfiguration config, ConfigurationSection configurationSection, File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
+    private boolean addKeys(FileConfiguration config, ConfigurationSection configurationSection, File file,
+                            InventoryGUI configYMLMenu, Plugin pluginEditing) {
         ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(configurationSection);
         if (configurationSection.getKeys(false).isEmpty()) {
             return false;
@@ -163,7 +178,7 @@ public class ConfigMenu {
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
             String perm2 = Objects.requireNonNullElseGet(perm, () -> "neoconfig.edit." + pluginEditing.getName());
             InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, perm2, permMessage, plugin), null);
+                    completeFunction, closeFunction, perm2, title, permMessage, plugin), null);
             keyMenu.addItem(inventoryItem);
         }
         return true;

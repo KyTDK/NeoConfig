@@ -15,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ChangeKey extends GUIAction {
@@ -27,16 +28,21 @@ public class ChangeKey extends GUIAction {
     private final BiConsumer<Player, String> completeFunction;
     private final String perm;
     private final Supplier<String> permMessage;
+    private final Consumer<Player> closeFunction;
+    private final String title;
 
     public ChangeKey(String subKey, FileConfiguration config, File file, ConfigurationSection key,
-                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction, String perm, Supplier<String> permMessage, Plugin pluginInstance) {
+                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction,
+                     Consumer<Player> closeFunction, String perm, String title, Supplier<String> permMessage, Plugin pluginInstance) {
         this.subKey = subKey;
         this.config = config;
         this.key = key;
         this.file = file;
         this.restoreInventory = restoreInventory;
         this.completeFunction = completeFunction;
+        this.closeFunction = closeFunction;
         this.perm = perm;
+        this.title = title;
         this.permMessage = permMessage;
         this.pluginInstance = pluginInstance;
     }
@@ -79,7 +85,11 @@ public class ChangeKey extends GUIAction {
                     }
                     return AnvilGUI.Response.close();
                 })
+                .title(title)
                 .onClose(playerAuthor -> {//called when the inventory is closed
+                    if (closeFunction != null) {
+                        closeFunction.accept(player);
+                    }
                     new BukkitRunnable() {
                         @Override
                         public void run() {
