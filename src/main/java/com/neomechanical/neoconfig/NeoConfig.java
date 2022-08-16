@@ -67,7 +67,7 @@ public final class NeoConfig extends NeoUtils {
         //Set language manager before majority as they depend on its messages.
         new LanguageManager(this)
                 .setLanguageCode(() -> NeoUtils.getConfigManager("config.yml").getConfig().getString("visual.language"))
-                .setLanguageFile("en-US.yml", "es-ES.yml", "fr-FR.yml", "ru-RU.yml", "tr-TR.yml", "zh-CN.yml")
+                .setLanguageFile("de-DE.yml", "en-US.yml", "es-ES.yml", "fr-FR.yml", "ru-RU.yml", "tr-TR.yml", "zh-CN.yml")
                 .set();
     }
 }

@@ -1,0 +1,9 @@
+commandGeneric:
+  errorPlayerNotFound: '<red><bold>Spieler nicht gefunden'
+  errorInvalidSyntax: '<red><bold>Ungültige Syntax - geben Sie "/nc help" ein, um Hilfe zu erhalten'
+  errorWorldNotFound: '<red><bold>Welt nicht gefunden'
+  errorNoPermission: '<red><bold>Du hast keine Berechtigung diesen Befehl zu verwenden'
+  errorNotPlayer: '<red><bold>Dieser Befehl ist nur für Spieler bestimmt'
+  errorCommandNotFound: '<red><bold>Befehl nicht gefunden, versuche /nc help'
+reload:
+  onReload: '<green><bold>Konfigurationsdatei neu geladen'
