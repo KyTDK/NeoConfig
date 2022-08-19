@@ -3,13 +3,5 @@ version: '${project.version}'
 main: com.neomechanical.neoconfig.NeoConfig
 api-version: 1.13
 authors: [ NeoDevs ]
-commands:
-  neoconfig:
-    description: Show config menu
-    aliases:
-      - nc
-      - config
-    permission: neoconfig.admin
-    usage: /neoconfig
 description: In-game config editor
 website: https://neomechanical.com

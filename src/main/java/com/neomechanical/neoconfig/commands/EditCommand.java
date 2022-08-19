@@ -3,7 +3,8 @@ package com.neomechanical.neoconfig.commands;
 import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoconfig.menu.ConfigMenu;
 import com.neomechanical.neoutils.NeoUtils;
-import com.neomechanical.neoutils.commandManager.SubCommand;
+import com.neomechanical.neoutils.commands.Command;
+import com.neomechanical.neoutils.languages.LanguageManager;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class EditCommand extends SubCommand {
+public class EditCommand extends Command {
     @Override
     public String getName() {
         return "edit";
@@ -41,25 +42,26 @@ public class EditCommand extends SubCommand {
         return true;
     }
 
+    private final LanguageManager languageManager = NeoUtils.getManagers().getLanguageManager();
     @Override
     public void perform(CommandSender player, String[] args) {
         Player playerAsPlayer = (Player) player;
         if (args.length == 1) {
-            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorInvalidSyntax", null));
+            MessageUtil.sendMM(player, NeoUtils.getManagers().getLanguageManager().getString("commandGeneric.errorInvalidSyntax", null));
             return;
         }
         Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);
         if (plugin == null) {
-            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorInvalidSyntax", null));
+            MessageUtil.sendMM(player, languageManager.getString("commandGeneric.errorInvalidSyntax", null));
             return;
         }
         if (player.hasPermission("neoconfig.edit." + plugin.getName())) {
             new ConfigMenu(NeoConfig.getInstance())
                     .permission("neoconfig.edit." + plugin.getName(),
-                            () -> NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null))
+                            () -> languageManager.getString("commandGeneric.errorNoPermission", null))
                     .open(playerAsPlayer, plugin);
         } else {
-            MessageUtil.sendMM(player, NeoUtils.getLanguageManager().getString("commandGeneric.errorNoPermission", null));
+            MessageUtil.sendMM(player, languageManager.getString("commandGeneric.errorNoPermission", null));
         }
     }
 

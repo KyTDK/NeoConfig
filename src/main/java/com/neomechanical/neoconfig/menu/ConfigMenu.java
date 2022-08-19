@@ -21,11 +21,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ConfigMenu {
     private final Plugin plugin;
@@ -50,7 +50,7 @@ public class ConfigMenu {
         }
         InventoryGUI menu = InventoryUtil.createInventoryGUI(null, 54, "NeoConfig");
         //get plugins
-        List<Plugin> plugins = Arrays.stream(Bukkit.getPluginManager().getPlugins()).toList();
+        List<Plugin> plugins = Arrays.stream(Bukkit.getPluginManager().getPlugins()).collect(Collectors.toList());
         for (Plugin p : plugins) {
             createPluginItem(p, menu);
         }
@@ -92,7 +92,7 @@ public class ConfigMenu {
         InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
         if (addFiles(pluginMenu, p.getDataFolder().listFiles())) {
             //Add pluginMenu item to main menu
-            InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(pluginMenu), null);
+            InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(pluginMenu).action(event), null);
             menu.addItem(inventoryItem);
         }
         pluginMenu.setOpenOnClose(menu);
@@ -115,7 +115,7 @@ public class ConfigMenu {
                 directory.setOpenOnClose(pluginMenu);
                 addFiles(directory, dirFiles);
                 pluginMenu.addItem(new InventoryItem(ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()),
-                        new OpenInventory(directory), null));
+                        (event) -> new OpenInventory(directory).action(event), null));
                 continue;
             }
             // Add all yml files inside the plugin data folder (excluding directories)
@@ -133,7 +133,7 @@ public class ConfigMenu {
             //Add Key items to configYMLMenu
             if (addKeys(config, config, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
-                InventoryItem ymlFile = new InventoryItem(item, new OpenInventory(keysMenu), null);
+                InventoryItem ymlFile = new InventoryItem(item, (event) -> new OpenInventory(keysMenu).action(event), null);
                 pluginMenu.addItem(ymlFile);
             }
             // Add YAML fields
@@ -156,7 +156,7 @@ public class ConfigMenu {
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
             keyMenu.setOpenOnClose(configYMLMenu);
             if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
-                InventoryItem inventoryItem = new InventoryItem(item, new OpenInventory(keyMenu), null);
+                InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(keyMenu).action(event), null);
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
             }
@@ -176,9 +176,15 @@ public class ConfigMenu {
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
-            String perm2 = Objects.requireNonNullElseGet(perm, () -> "neoconfig.edit." + pluginEditing.getName());
-            InventoryItem inventoryItem = new InventoryItem(item, new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, closeFunction, perm2, title, permMessage, plugin), null);
+            String perm2;
+            if (perm != null) {
+                perm2 = perm;
+            } else {
+                perm2 = "neoconfig.edit." + pluginEditing.getName();
+
+            }
+            InventoryItem inventoryItem = new InventoryItem(item, (event) -> new ChangeKey(subKey, config, file, key, keyMenu,
+                    completeFunction, closeFunction, perm2, title, permMessage, plugin).action(event), null);
             keyMenu.addItem(inventoryItem);
         }
         return true;

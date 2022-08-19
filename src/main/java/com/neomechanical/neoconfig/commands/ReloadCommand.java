@@ -2,14 +2,14 @@ package com.neomechanical.neoconfig.commands;
 
 import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoutils.NeoUtils;
-import com.neomechanical.neoutils.commandManager.SubCommand;
+import com.neomechanical.neoutils.commands.Command;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.Map;
 
-public class ReloadCommand extends SubCommand {
+public class ReloadCommand extends Command {
     @Override
     public String getName() {
         return "reload";
@@ -38,7 +38,7 @@ public class ReloadCommand extends SubCommand {
     @Override
     public void perform(CommandSender commandSender, String[] strings) {
         NeoConfig.reload();
-        MessageUtil.sendMM(commandSender, NeoUtils.getLanguageManager().getString("reload.onReload", null));
+        MessageUtil.sendMM(commandSender, NeoUtils.getManagers().getLanguageManager().getString("reload.onReload", null));
     }
 
     @Override

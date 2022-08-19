@@ -1,6 +1,5 @@
 package com.neomechanical.neoconfig.menu.actions;
 
-import com.neomechanical.neoutils.inventory.GUIAction;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.messages.MessageUtil;
@@ -18,7 +17,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ChangeKey extends GUIAction {
+public class ChangeKey {
     private final ConfigurationSection key;
     private final String subKey;
     private final File file;
@@ -47,7 +46,6 @@ public class ChangeKey extends GUIAction {
         this.pluginInstance = pluginInstance;
     }
 
-    @Override
     public void action(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if (!player.hasPermission(perm)) {
