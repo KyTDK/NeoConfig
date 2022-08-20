@@ -19,6 +19,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static com.neomechanical.neoconfig.NeoConfig.getLanguageManager;
+
 public class ChangeKey {
     private final ConfigurationSection key;
     private final String subKey;
@@ -114,8 +116,22 @@ public class ChangeKey {
                 .open(player);
     }
 
-    public void actionList(InventoryClickEvent event, String initialKeyValueShow, List<?> initialKeyValueList) {
+    public void actionList(InventoryClickEvent event, int initialKeyValueIndex) {
         Player player = (Player) event.getWhoClicked();
+        String initialKeyValueShow;
+        List<?> initialKeyValueList;
+        if (key.get(subKey) instanceof List) {
+            initialKeyValueList = (List<?>) key.get(subKey);
+            if (initialKeyValueList != null) {
+                initialKeyValueShow = initialKeyValueList.get(initialKeyValueIndex).toString();
+            } else {
+                MessageUtil.sendMM(player, getLanguageManager().getString("generic.errorUnknown", null));
+                return;
+            }
+        } else {
+            MessageUtil.sendMM(player, getLanguageManager().getString("generic.errorUnknown", null));
+            return;
+        }
         new AnvilGUI.Builder()
                 .onComplete((playerAuthor, text) -> {//called when the inventory output slot is clicked
                     if (initialKeyValueList.get(0) instanceof String) {

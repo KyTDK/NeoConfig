@@ -123,7 +123,7 @@ public class ListEditor {
                     elementalGUI, completeFunction, closeFunction, perm, title, permMessage, pluginInstance);
             //inventoryToHandle is an empty page
             InventoryItem edit = new InventoryItem(ItemUtil.createItem(Material.TRIPWIRE_HOOK, "&aEdit '" + object.toString() + "'"),
-                    (event) -> changeKey.actionList(event, object.toString(), initialKeyValue), null);
+                    (event) -> changeKey.actionList(event, initialKeyValue.indexOf(object)), null);
             inventoryToHandle.setItem(4, edit);
             if (!pages.isEmpty()) {
                 Consumer<InventoryClickEvent> close;

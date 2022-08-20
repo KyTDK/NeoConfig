@@ -5,11 +5,18 @@ import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.commands.CommandBuilder;
 import com.neomechanical.neoutils.commands.easyCommands.EasyHelpCommand;
 import com.neomechanical.neoutils.languages.LanguageManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class RegisterCommands {
     private static final LanguageManager languageManager = NeoUtils.getManagers().getLanguageManager();
-    public static void register() {
-        CommandBuilder commandBuilder = new CommandBuilder(new MainCommand());
+    private final JavaPlugin plugin;
+
+    public RegisterCommands(JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public void register() {
+        CommandBuilder commandBuilder = new CommandBuilder(plugin, new MainCommand());
         //set messages
         commandBuilder.setErrorCommandNotFound(() -> languageManager.getString("commandGeneric.errorCommandNotFound", null))
                 .setErrorNoPermission(() -> languageManager.getString("commandGeneric.errorNoPermission", null))

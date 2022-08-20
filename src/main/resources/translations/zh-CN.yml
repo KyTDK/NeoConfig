@@ -6,5 +6,7 @@ commandGeneric:
   errorNoPermission: '<red><bold>您没有使用此命令的权限'
   errorNotPlayer: '<red><bold>此命令仅供玩家使用'
   errorCommandNotFound: '<red><bold>找不到命令，尝试 /nc help'
+generic:
+  errorUnknown: '<red><bold>出了点问题，请重试'
 reload:
   onReload: '<green><bold>重新加载配置文件'

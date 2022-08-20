@@ -5,5 +5,7 @@ commandGeneric:
   errorNoPermission: '<red><bold>Du hast keine Berechtigung diesen Befehl zu verwenden'
   errorNotPlayer: '<red><bold>Dieser Befehl ist nur für Spieler bestimmt'
   errorCommandNotFound: '<red><bold>Befehl nicht gefunden, versuche /nc help'
+generic:
+  errorUnknown: '<red><bold>Etwas ist schief gelaufen, bitte versuchen Sie es erneut'
 reload:
   onReload: '<green><bold>Konfigurationsdatei neu geladen'

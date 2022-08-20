@@ -6,8 +6,7 @@ commandGeneric:
   errorNoPermission: "<red><bold>Vous n'êtes pas autorisé à utiliser cette commande"
   errorNotPlayer: '<red><bold>Cette commande est réservée aux joueurs'
   errorCommandNotFound: '<red><bold>Commande introuvable, essayez /nc help'
-halt:
-  toggleHaltOn: '<red><bold>Le serveur a été arrêté'
-  toggleHaltOff: '<green><bold>Le serveur a été repris'
+generic:
+  errorUnknown: "<red><bold>Une erreur s'est produite, veuillez réessayer"
 reload:
   onReload: '<green><bold>Fichier de configuration rechargé'

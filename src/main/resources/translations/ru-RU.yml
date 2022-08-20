@@ -6,5 +6,7 @@ commandGeneric:
   errorNoPermission: '<red><bold>У вас нет разрешения на использование этой команды'
   errorNotPlayer: '<red><bold>Эта команда только для игроков'
   errorCommandNotFound: '<red><bold>Команда не найдена, попробуйте /nc help'
+generic:
+  errorUnknown: '<red><bold>Что-то пошло не так, попробуйте еще раз'
 reload:
   onReload: '<green><bold>Конфиг перезагружен'
