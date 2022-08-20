@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoconfig.java.Lists;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.messages.MessageUtil;
@@ -13,6 +14,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -55,6 +57,17 @@ public class ChangeKey {
         Object initialKeyValue = key.get(subKey);
         if (initialKeyValue == null) {
             throw new IllegalArgumentException("Key " + subKey + " does not exist in " + file.getName());
+        }
+        if (initialKeyValue instanceof List) {
+            new ListEditor.ListEditorBuilder(player, pluginInstance, (List<?>) initialKeyValue, subKey, config, file, key, restoreInventory)
+                    .setCompleteFunction(completeFunction)
+                    .setCloseFunction(closeFunction)
+                    .setTitle(title)
+                    .setPerm(perm)
+                    .setPermMessage(permMessage)
+                    .create()
+                    .open();
+            return;
         }
         if (initialKeyValue.toString().length() > 50) {
             MessageUtil.sendMM(player, "<red><bold>Key value is too long.");
@@ -99,5 +112,54 @@ public class ChangeKey {
                 .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
                 .plugin(pluginInstance)                                          //set the plugin instance
                 .open(player);
+    }
+
+    public void actionList(InventoryClickEvent event, String initialKeyValueShow, List<?> initialKeyValueList) {
+        Player player = (Player) event.getWhoClicked();
+        new AnvilGUI.Builder()
+                .onComplete((playerAuthor, text) -> {//called when the inventory output slot is clicked
+                    if (initialKeyValueList.get(0) instanceof String) {
+                        updateList(initialKeyValueShow, initialKeyValueList, text);
+                    } else if (initialKeyValueList.get(0) instanceof Integer) {
+                        updateList(initialKeyValueShow, initialKeyValueList, text);
+                    } else if (initialKeyValueList.get(0) instanceof Double) {
+                        updateList(initialKeyValueShow, initialKeyValueList, text);
+                    } else if (initialKeyValueList.get(0) instanceof Boolean) {
+                        updateList(initialKeyValueShow, initialKeyValueList, text);
+                    } else {
+                        throw new IllegalArgumentException("Unsupported type");
+                    }
+                    try {
+                        config.save(file);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (completeFunction != null) {
+                        completeFunction.accept(player, text);
+                    }
+                    return AnvilGUI.Response.close();
+                })
+                .title(title)
+                .onClose(playerAuthor -> {//called when the inventory is closed
+                    if (closeFunction != null) {
+                        closeFunction.accept(player);
+                    }
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            InventoryUtil.openInventory(playerAuthor, restoreInventory);
+                        }
+                    }.runTaskLater(pluginInstance, 1L);
+                })
+                .text(initialKeyValueShow)                              //sets the text the GUI should start with
+                .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
+                .plugin(pluginInstance)                                          //set the plugin instance
+                .open(player);
+    }
+
+    private <type> void updateList(String initialKeyValueShow, List<?> initialKeyValueList, String text) {
+        List<type> newList = Lists.cast(initialKeyValueList);
+        newList.set(newList.indexOf(initialKeyValueShow), (type) text);
+        key.set(subKey, newList);
     }
 }
