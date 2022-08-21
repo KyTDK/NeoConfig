@@ -5,12 +5,11 @@ import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.java.Lists;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import net.wesjd.anvilgui.AnvilGUI;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,10 +21,10 @@ import java.util.function.Supplier;
 import static com.neomechanical.neoconfig.NeoConfig.getLanguageManager;
 
 public class ChangeKey {
-    private final ConfigurationSection key;
+    private final Yaml key;
     private final String subKey;
     private final File file;
-    private final FileConfiguration config;
+    private final Yaml config;
     private final Plugin pluginInstance;
     private final InventoryGUI restoreInventory;
     private final BiConsumer<Player, String> completeFunction;
@@ -34,7 +33,7 @@ public class ChangeKey {
     private final Consumer<Player> closeFunction;
     private final String title;
 
-    public ChangeKey(String subKey, FileConfiguration config, File file, ConfigurationSection key,
+    public ChangeKey(String subKey, Yaml config, File file, Yaml key,
                      InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction,
                      Consumer<Player> closeFunction, String perm, String title, Supplier<String> permMessage, Plugin pluginInstance) {
         this.subKey = subKey;

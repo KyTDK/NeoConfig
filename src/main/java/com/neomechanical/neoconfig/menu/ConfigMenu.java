@@ -1,7 +1,6 @@
 package com.neomechanical.neoconfig.menu;
 
 import com.neomechanical.neoconfig.menu.actions.ChangeKey;
-import com.neomechanical.neoutils.config.ConfigUtil;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.actions.OpenInventory;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -10,22 +9,26 @@ import com.neomechanical.neoutils.items.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static com.neomechanical.neoconfig.config.YamlUtils.isConfigurationSection;
 
 public class ConfigMenu {
     private final Plugin plugin;
@@ -126,7 +129,15 @@ public class ConfigMenu {
 
     private void addFile(File file, InventoryGUI pluginMenu) {
         if (file.getName().endsWith(".yml")) {
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            Yaml config = new Yaml();
+            Map<String, Object> data;
+            try {
+                InputStream targetStream = new FileInputStream(file);
+                data = config.load(targetStream);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+
             //Create YML item with all keys
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
@@ -141,19 +152,18 @@ public class ConfigMenu {
         }
     }
 
-    private boolean addKeys(FileConfiguration config, ConfigurationSection configurationSection, File file,
+    private boolean addKeys(Yaml config, Map<String, Object> configurationSection, File file,
                             InventoryGUI configYMLMenu, Plugin pluginEditing) {
-        ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(configurationSection);
-        if (configurationSection.getKeys(false).isEmpty()) {
+        if (configurationSection.isEmpty()) {
             return false;
         }
-        for (ConfigurationSection key : keys) {
-            if (key == null || key.getKeys(false).isEmpty()) {
+        for (String key : configurationSection.keySet()) {
+            if (key == null) {
                 continue;
             }
-            ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET + key.getName());
+            ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET + key);
             //Create GUI for all the keys
-            InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
+            InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key);
             keyMenu.setOpenOnClose(configYMLMenu);
             if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
                 InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(keyMenu).action(event), null);
@@ -164,14 +174,18 @@ public class ConfigMenu {
         return true;
     }
 
-    private boolean addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu, Plugin pluginEditing) {
-        Set<String> keys = key.getKeys(false);
+    private boolean addSubKeys(Yaml config, File file, Map<String, Object> data, InventoryGUI keyMenu, Plugin pluginEditing) {
+        List<String> keys = new ArrayList<>();
+        for (String value : data.keySet()) {
+            if (value != null) {
+                keys.add(value);
+            }
+        }
         if (keys.isEmpty()) {
             return false;
         }
         for (String subKey : keys) {
-            ConfigurationSection section = key.getConfigurationSection(subKey);
-            if (key.isConfigurationSection(subKey) && section != null) {
+            if (isConfigurationSection(data, subKey) && section != null) {
                 addKeys(config, section, file, keyMenu, pluginEditing);
                 continue;
             }

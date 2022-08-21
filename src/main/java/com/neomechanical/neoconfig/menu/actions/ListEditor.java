@@ -132,11 +132,11 @@ public class ListEditor {
                 } else {
                     close = (event) -> new OpenInventory(pages.get(pages.indexOf(inventoryToHandle) - 1)).action(event);
                 }
-                InventoryItem left = new InventoryItem(ItemUtil.createItem(Material.DARK_OAK_BUTTON, "&aLeft"), close, null);
+                InventoryItem left = new InventoryItem(ItemUtil.createItem(Material.OAK_BUTTON, "&aLeft"), close, null);
                 inventoryToHandle.setItem(0, left);
             }
             if (initialKeyValue.indexOf(object) != initialKeyValue.size() - 1) {
-                InventoryItem right = new InventoryItem(ItemUtil.createItem(Material.DARK_OAK_BUTTON, "&aRight"),
+                InventoryItem right = new InventoryItem(ItemUtil.createItem(Material.OAK_BUTTON, "&aRight"),
                         (event) -> InventoryUtil.openInventory(player, pages.get(pages.indexOf(inventoryToHandle) + 1)), null);
                 inventoryToHandle.setItem(8, right);
             }
