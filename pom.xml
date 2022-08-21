@@ -6,7 +6,7 @@
 
     <groupId>com.neomechanical</groupId>
     <artifactId>NeoConfig</artifactId>
-    <version>1.4.2</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>NeoConfig</name>
