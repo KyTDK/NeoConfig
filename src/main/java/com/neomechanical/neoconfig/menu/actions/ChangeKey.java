@@ -1,8 +1,8 @@
 package com.neomechanical.neoconfig.menu.actions;
 
-import com.neomechanical.neoconfig.java.Lists;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
+import com.neomechanical.neoutils.java.Lists;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.configuration.ConfigurationSection;
