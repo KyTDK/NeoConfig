@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoutils.config.yaml.YamlConfSection;
 import com.neomechanical.neoutils.config.yaml.YamlUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -24,10 +25,10 @@ import static com.neomechanical.neoconfig.NeoConfig.getLanguageManager;
 
 public class ChangeKey {
     //Required
-    private final Yaml yaml;
     private final String subKey;
     private final File file;
-    private final Map<String, Object> data;
+    private final YamlConfSection dataSect;
+    private final Map<String, Object> dataMain;
     private final Plugin pluginInstance;
     //Optional
     private final BiConsumer<Player, String> completeFunction;
@@ -40,8 +41,8 @@ public class ChangeKey {
     public ChangeKey(ChangeKeyBuilder changeKeyBuilder) {
         //Required
         this.subKey = changeKeyBuilder.subKey;
-        this.yaml = changeKeyBuilder.yaml;
-        this.data = changeKeyBuilder.data;
+        this.dataSect = changeKeyBuilder.dataSect;
+        this.dataMain = changeKeyBuilder.dataMain;
         this.file = changeKeyBuilder.file;
         this.pluginInstance = changeKeyBuilder.pluginInstance;
         //Optional
@@ -186,10 +187,10 @@ public class ChangeKey {
 
     public static class ChangeKeyBuilder {
         //Required
-        private final Yaml yaml;
         private final String subKey;
         private final File file;
-        private final Map<String, Object> data;
+        private final YamlConfSection dataSect;
+        private final Map<String, Object> dataMain;
         private final Plugin pluginInstance;
         //Optional
         private BiConsumer<Player, String> completeFunction;
@@ -199,11 +200,11 @@ public class ChangeKey {
         private String title;
         private InventoryGUI restoreInventory;
 
-        public ChangeKeyBuilder(Yaml yaml, String subKey, File file, Map<String, Object> data, Plugin pluginInstance) {
-            this.yaml = yaml;
+        public ChangeKeyBuilder(String subKey, File file, YamlConfSection dataSect, Map<String, Object> dataMain, Plugin pluginInstance) {
             this.subKey = subKey;
             this.file = file;
-            this.data = data;
+            this.dataSect = dataSect;
+            this.dataMain = dataMain;
             this.pluginInstance = pluginInstance;
         }
 

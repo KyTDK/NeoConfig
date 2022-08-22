@@ -128,9 +128,9 @@ public class ConfigMenu {
 
     private void addFile(File file, InventoryGUI pluginMenu) {
         if (file.getName().endsWith(".yml")) {
-            Yaml config = new Yaml();
             YamlConfSection data;
             try {
+                Yaml config = new Yaml();
                 InputStream targetStream = new FileInputStream(file);
                 Map<String, Object> dataRaw = config.load(targetStream);
                 data = new YamlConfSection(file.getName(), dataRaw);
@@ -142,18 +142,18 @@ public class ConfigMenu {
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
-            if (addKeys(config, data, file, keysMenu, plugin)) {
+            if (addKeys(data, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
                 InventoryItem ymlFile = new InventoryItem(item, (event) -> new OpenInventory(keysMenu).action(event), null);
                 pluginMenu.addItem(ymlFile);
             }
             // Add YAML fields
-            addSubKeys(config, file, data, keysMenu, plugin);
+            addSubKeys(file, data, keysMenu, plugin);
         }
     }
 
-    private boolean addKeys(Yaml config, YamlConfSection configurationSection, File file,
-                            InventoryGUI configYMLMenu, Plugin pluginEditing) {
+    private boolean addKeys(YamlConfSection configurationSection, Map<String, Object> dataMain,
+                            File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
         ArrayList<YamlConfSection> keys = getConfigurationSections(configurationSection.data);
         if (keys == null) {
             return false;
@@ -170,7 +170,7 @@ public class ConfigMenu {
             //Create GUI for all the keys
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, keyName);
             keyMenu.setOpenOnClose(configYMLMenu);
-            if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
+            if (addSubKeys(file, key, keyMenu, pluginEditing)) {
                 InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(keyMenu).action(event), null);
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
@@ -179,15 +179,15 @@ public class ConfigMenu {
         return true;
     }
 
-    private boolean addSubKeys(Yaml config, File file, YamlConfSection data, InventoryGUI keyMenu, Plugin pluginEditing) {
-        Set<String> keys = getKeys(false, data.data);
+    private boolean addSubKeys(File file, YamlConfSection dataSect, Map<String, Object> dataMain, InventoryGUI keyMenu, Plugin pluginEditing) {
+        Set<String> keys = getKeys(false, dataSect.data);
         if (keys == null) {
             return false;
         }
         for (String subKey : keys) {
-            YamlConfSection configSection = getConfigurationSection(data.data, subKey);
-            if (isConfigurationSection(data.data, subKey) && configSection != null) {
-                addKeys(config, configSection, file, keyMenu, pluginEditing);
+            YamlConfSection configSection = getConfigurationSection(dataSect.data, subKey);
+            if (isConfigurationSection(dataSect.data, subKey) && configSection != null) {
+                addKeys(configSection, file, keyMenu, pluginEditing);
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
@@ -198,7 +198,7 @@ public class ConfigMenu {
                 perm2 = "neoconfig.edit." + pluginEditing.getName();
 
             }
-            ChangeKey.ChangeKeyBuilder changeKeyBuilder = new ChangeKey.ChangeKeyBuilder(config, subKey, file, data.data, plugin);
+            ChangeKey.ChangeKeyBuilder changeKeyBuilder = new ChangeKey.ChangeKeyBuilder(subKey, file, dataSect, dataMain, plugin);
             changeKeyBuilder.setCompleteFunction(completeFunction);
             changeKeyBuilder.setCloseFunction(closeFunction);
             changeKeyBuilder.setPerm(perm2);
