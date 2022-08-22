@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoutils.config.yaml.YamlUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.java.Lists;
@@ -12,7 +13,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +92,7 @@ public class ChangeKey {
                         throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
                     }
                     try {
-                        yaml.dump(data, new FileWriter(file));
+                        YamlUtils.save(yaml, file, data);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -151,7 +151,7 @@ public class ChangeKey {
                         throw new IllegalArgumentException("Unsupported type");
                     }
                     try {
-                        yaml.dump(data, new FileWriter(file));
+                        YamlUtils.save(yaml, file, data);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

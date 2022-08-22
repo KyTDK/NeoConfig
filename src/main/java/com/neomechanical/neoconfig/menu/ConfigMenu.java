@@ -1,6 +1,7 @@
 package com.neomechanical.neoconfig.menu;
 
 import com.neomechanical.neoconfig.menu.actions.ChangeKey;
+import com.neomechanical.neoutils.config.yaml.YamlConfSection;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.actions.OpenInventory;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -19,18 +20,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.neomechanical.neoutils.config.yaml.YamlKeys.getKeys;
-import static com.neomechanical.neoutils.config.yaml.YamlUtils.getConfigurationSection;
-import static com.neomechanical.neoutils.config.yaml.YamlUtils.isConfigurationSection;
+import static com.neomechanical.neoutils.config.yaml.YamlUtils.*;
 
 public class ConfigMenu {
     private final Plugin plugin;
@@ -132,10 +129,11 @@ public class ConfigMenu {
     private void addFile(File file, InventoryGUI pluginMenu) {
         if (file.getName().endsWith(".yml")) {
             Yaml config = new Yaml();
-            Map<String, Object> data;
+            YamlConfSection data;
             try {
                 InputStream targetStream = new FileInputStream(file);
-                data = config.load(targetStream);
+                Map<String, Object> dataRaw = config.load(targetStream);
+                data = new YamlConfSection(file.getName(), dataRaw);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -154,20 +152,25 @@ public class ConfigMenu {
         }
     }
 
-    private boolean addKeys(Yaml config, Map<String, Object> configurationSection, File file,
+    private boolean addKeys(Yaml config, YamlConfSection configurationSection, File file,
                             InventoryGUI configYMLMenu, Plugin pluginEditing) {
-        if (configurationSection.isEmpty()) {
+        ArrayList<YamlConfSection> keys = getConfigurationSections(configurationSection.data);
+        if (keys == null) {
             return false;
         }
-        for (String key : configurationSection.keySet()) {
-            if (key == null) {
+        if (getKeys(false, configurationSection.data) == null) {
+            return false;
+        }
+        for (YamlConfSection key : keys) {
+            if (key == null || getKeys(false, key.data) == null) {
                 continue;
             }
-            ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET + key);
+            String keyName = key.name;
+            ItemStack item = ItemUtil.createItem(Material.PAPER, ChatColor.RESET + keyName);
             //Create GUI for all the keys
-            InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key);
+            InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, keyName);
             keyMenu.setOpenOnClose(configYMLMenu);
-            if (addSubKeys(config, file, configurationSection, keyMenu, pluginEditing)) {
+            if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
                 InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(keyMenu).action(event), null);
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
@@ -176,14 +179,14 @@ public class ConfigMenu {
         return true;
     }
 
-    private boolean addSubKeys(Yaml config, File file, Map<String, Object> data, InventoryGUI keyMenu, Plugin pluginEditing) {
-        Set<String> keys = getKeys(false, data);
-        if (keys.isEmpty()) {
+    private boolean addSubKeys(Yaml config, File file, YamlConfSection data, InventoryGUI keyMenu, Plugin pluginEditing) {
+        Set<String> keys = getKeys(false, data.data);
+        if (keys == null) {
             return false;
         }
         for (String subKey : keys) {
-            Map<String, Object> configSection = getConfigurationSection(data, subKey);
-            if (isConfigurationSection(data, subKey) && configSection != null) {
+            YamlConfSection configSection = getConfigurationSection(data.data, subKey);
+            if (isConfigurationSection(data.data, subKey) && configSection != null) {
                 addKeys(config, configSection, file, keyMenu, pluginEditing);
                 continue;
             }
@@ -195,7 +198,7 @@ public class ConfigMenu {
                 perm2 = "neoconfig.edit." + pluginEditing.getName();
 
             }
-            ChangeKey.ChangeKeyBuilder changeKeyBuilder = new ChangeKey.ChangeKeyBuilder(config, subKey, file, data, plugin);
+            ChangeKey.ChangeKeyBuilder changeKeyBuilder = new ChangeKey.ChangeKeyBuilder(config, subKey, file, data.data, plugin);
             changeKeyBuilder.setCompleteFunction(completeFunction);
             changeKeyBuilder.setCloseFunction(closeFunction);
             changeKeyBuilder.setPerm(perm2);
