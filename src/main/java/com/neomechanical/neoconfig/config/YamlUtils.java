@@ -1,12 +1,14 @@
 package com.neomechanical.neoconfig.config;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 
 public class YamlUtils {
     public static boolean isConfigurationSection(Map<String, Object> data, String key) {
         for (Object value : data.values()) {
             if (value instanceof Map) {
-                if (value.equals(key)) {
+                if (data.get(key) == value) {
                     return true;
                 }
             }
@@ -14,14 +16,19 @@ public class YamlUtils {
         return false;
     }
 
-    public static boolean getConfigurationSection(Map<String, Object> data, String key) {
+    public static Map<String, Object> getConfigurationSection(Map<String, Object> data, String key) {
         for (Object value : data.values()) {
             if (value instanceof Map) {
-                if (value.equals(key)) {
-                    return true;
+                if (data.get(key) == value) {
+                    Map<String, Object> map = new HashMap<>();
+                    for (Field field : value.getClass().getDeclaredFields()) {
+                        field.setAccessible(true);
+                        try { map.put(field.getName(), field.get(value)); } catch (Exception ignored) { }
+                    }
+                    return map;
                 }
             }
         }
-        return false;
+        return null;
     }
 }

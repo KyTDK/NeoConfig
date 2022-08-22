@@ -12,8 +12,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -21,32 +21,34 @@ import java.util.function.Supplier;
 import static com.neomechanical.neoconfig.NeoConfig.getLanguageManager;
 
 public class ChangeKey {
-    private final Yaml key;
+    //Required
+    private final Yaml yaml;
     private final String subKey;
     private final File file;
-    private final Yaml config;
+    private final Map<String, Object> data;
     private final Plugin pluginInstance;
-    private final InventoryGUI restoreInventory;
+    //Optional
     private final BiConsumer<Player, String> completeFunction;
     private final String perm;
     private final Supplier<String> permMessage;
     private final Consumer<Player> closeFunction;
     private final String title;
+    private final InventoryGUI restoreInventory;
 
-    public ChangeKey(String subKey, Yaml config, File file, Yaml key,
-                     InventoryGUI restoreInventory, BiConsumer<Player, String> completeFunction,
-                     Consumer<Player> closeFunction, String perm, String title, Supplier<String> permMessage, Plugin pluginInstance) {
-        this.subKey = subKey;
-        this.config = config;
-        this.key = key;
-        this.file = file;
-        this.restoreInventory = restoreInventory;
-        this.completeFunction = completeFunction;
-        this.closeFunction = closeFunction;
-        this.perm = perm;
-        this.title = title;
-        this.permMessage = permMessage;
-        this.pluginInstance = pluginInstance;
+    public ChangeKey(ChangeKeyBuilder changeKeyBuilder) {
+        //Required
+        this.subKey = changeKeyBuilder.subKey;
+        this.yaml = changeKeyBuilder.yaml;
+        this.data = changeKeyBuilder.data;
+        this.file = changeKeyBuilder.file;
+        this.pluginInstance = changeKeyBuilder.pluginInstance;
+        //Optional
+        this.restoreInventory = changeKeyBuilder.restoreInventory;
+        this.completeFunction = changeKeyBuilder.completeFunction;
+        this.closeFunction = changeKeyBuilder.closeFunction;
+        this.perm = changeKeyBuilder.perm;
+        this.title = changeKeyBuilder.title;
+        this.permMessage = changeKeyBuilder.permMessage;
     }
 
     public void action(InventoryClickEvent event) {
@@ -77,21 +79,17 @@ public class ChangeKey {
         new AnvilGUI.Builder()
                 .onComplete((playerAuthor, text) -> {                                    //called when the inventory output slot is clicked
                     if (initialKeyValue instanceof String) {
-                        key.set(subKey, text);
+                        data.put(subKey, text);
                     } else if (initialKeyValue instanceof Integer) {
-                        key.set(subKey, Integer.parseInt(text));
+                        data.put(subKey, Integer.parseInt(text));
                     } else if (initialKeyValue instanceof Double) {
-                        key.set(subKey, Double.parseDouble(text));
+                        data.put(subKey, Double.parseDouble(text));
                     } else if (initialKeyValue instanceof Boolean) {
-                        key.set(subKey, Boolean.parseBoolean(text));
+                        data.put(subKey, Boolean.parseBoolean(text));
                     } else {
                         throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
                     }
-                    try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    yaml.dump(data);
                     if (completeFunction != null) {
                         completeFunction.accept(player, text);
                     }
@@ -102,12 +100,14 @@ public class ChangeKey {
                     if (closeFunction != null) {
                         closeFunction.accept(player);
                     }
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            InventoryUtil.openInventory(playerAuthor, restoreInventory);
-                        }
-                    }.runTaskLater(pluginInstance, 1L);
+                    if (restoreInventory != null) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                InventoryUtil.openInventory(playerAuthor, restoreInventory);
+                            }
+                        }.runTaskLater(pluginInstance, 1L);
+                    }
                 })
                 .text(initialKeyValue.toString())                              //sets the text the GUI should start with
                 .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
@@ -144,11 +144,7 @@ public class ChangeKey {
                     } else {
                         throw new IllegalArgumentException("Unsupported type");
                     }
-                    try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    yaml.dump(data);
                     if (completeFunction != null) {
                         completeFunction.accept(player, text);
                     }
@@ -175,6 +171,62 @@ public class ChangeKey {
     private <type> void updateList(String initialKeyValueShow, List<?> initialKeyValueList, String text) {
         List<type> newList = Lists.cast(initialKeyValueList);
         newList.set(newList.indexOf(initialKeyValueShow), (type) text);
-        key.set(subKey, newList);
+        data.put(subKey, newList);
+    }
+    public static class ChangeKeyBuilder() {
+        //Required
+        private final Yaml yaml;
+        private final String subKey;
+        private final File file;
+        private final Map<String, Object> data;
+        private final Plugin pluginInstance;
+        //Optional
+        private BiConsumer<Player, String> completeFunction;
+        private String perm;
+        private Supplier<String> permMessage;
+        private Consumer<Player> closeFunction;
+        private String title;
+        private InventoryGUI restoreInventory;
+
+        public ChangeKeyBuilder(Yaml yaml, String subKey, File file, Map<String, Object> data, Plugin pluginInstance) {
+            this.yaml = yaml;
+            this.subKey = subKey;
+            this.file = file;
+            this.data = data;
+            this.pluginInstance = pluginInstance;
+        }
+
+        public ChangeKeyBuilder setCompleteFunction(BiConsumer<Player, String> completeFunction) {
+            this.completeFunction = completeFunction;
+            return this;
+        }
+
+        public ChangeKeyBuilder setPerm(String perm) {
+            this.perm = perm;
+            return this;
+        }
+
+        public ChangeKeyBuilder setPermMessage(Supplier<String> permMessage) {
+            this.permMessage = permMessage;
+            return this;
+        }
+
+        public ChangeKeyBuilder setCloseFunction(Consumer<Player> closeFunction) {
+            this.closeFunction = closeFunction;
+            return this;
+        }
+
+        public ChangeKeyBuilder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public ChangeKeyBuilder setRestoreInventory(InventoryGUI restoreInventory) {
+            this.restoreInventory = restoreInventory;
+            return this;
+        }
+        public ChangeKey build() {
+            return new ChangeKey(this);
+        }
     }
 }

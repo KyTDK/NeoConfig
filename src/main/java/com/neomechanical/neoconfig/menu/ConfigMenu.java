@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.neomechanical.neoconfig.config.YamlUtils.getConfigurationSection;
 import static com.neomechanical.neoconfig.config.YamlUtils.isConfigurationSection;
 
 public class ConfigMenu {
@@ -142,13 +143,13 @@ public class ConfigMenu {
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
-            if (addKeys(config, config, file, keysMenu, plugin)) {
+            if (addKeys(config, data, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
                 InventoryItem ymlFile = new InventoryItem(item, (event) -> new OpenInventory(keysMenu).action(event), null);
                 pluginMenu.addItem(ymlFile);
             }
             // Add YAML fields
-            addSubKeys(config, file, config, keysMenu, plugin);
+            addSubKeys(config, file, data, keysMenu, plugin);
         }
     }
 
@@ -165,7 +166,7 @@ public class ConfigMenu {
             //Create GUI for all the keys
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key);
             keyMenu.setOpenOnClose(configYMLMenu);
-            if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
+            if (addSubKeys(config, file, configurationSection, keyMenu, pluginEditing)) {
                 InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(keyMenu).action(event), null);
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
@@ -185,8 +186,9 @@ public class ConfigMenu {
             return false;
         }
         for (String subKey : keys) {
-            if (isConfigurationSection(data, subKey) && section != null) {
-                addKeys(config, section, file, keyMenu, pluginEditing);
+            Map<String, Object> configSection = getConfigurationSection(data, subKey);
+            if (isConfigurationSection(data, subKey) && configSection != null) {
+                addKeys(config, configSection, file, keyMenu, pluginEditing);
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
@@ -197,8 +199,11 @@ public class ConfigMenu {
                 perm2 = "neoconfig.edit." + pluginEditing.getName();
 
             }
-            InventoryItem inventoryItem = new InventoryItem(item, (event) -> new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, closeFunction, perm2, title, permMessage, plugin).action(event), null);
+            ChangeKey.ChangeKeyBuilder changeKeyBuilder = new ChangeKey.ChangeKeyBuilder(config, subKey, file, data, plugin);
+            changeKeyBuilder.setCompleteFunction(completeFunction);
+            changeKeyBuilder.setCloseFunction(closeFunction);
+            changeKeyBuilder.
+            InventoryItem inventoryItem = new InventoryItem(item, (event) -> changeKey.action(event), null);
             keyMenu.addItem(inventoryItem);
         }
         return true;
