@@ -12,6 +12,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -53,16 +55,16 @@ public class ChangeKey {
 
     public void action(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if (!player.hasPermission(perm)) {
+        if (perm != null && !player.hasPermission(perm)) {
             MessageUtil.sendMM(player, permMessage.get());
             return;
         }
-        Object initialKeyValue = key.get(subKey);
+        Object initialKeyValue = data.get(subKey);
         if (initialKeyValue == null) {
             throw new IllegalArgumentException("Key " + subKey + " does not exist in " + file.getName());
         }
         if (initialKeyValue instanceof List) {
-            new ListEditor.ListEditorBuilder(player, pluginInstance, (List<?>) initialKeyValue, subKey, config, file, key, restoreInventory)
+            new ListEditor.ListEditorBuilder(player, pluginInstance, this, (List<?>) initialKeyValue, subKey, yaml, file, data, restoreInventory)
                     .setCompleteFunction(completeFunction)
                     .setCloseFunction(closeFunction)
                     .setTitle(title)
@@ -89,7 +91,11 @@ public class ChangeKey {
                     } else {
                         throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
                     }
-                    yaml.dump(data);
+                    try {
+                        yaml.dump(data, new FileWriter(file));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     if (completeFunction != null) {
                         completeFunction.accept(player, text);
                     }
@@ -119,8 +125,8 @@ public class ChangeKey {
         Player player = (Player) event.getWhoClicked();
         String initialKeyValueShow;
         List<?> initialKeyValueList;
-        if (key.get(subKey) instanceof List) {
-            initialKeyValueList = (List<?>) key.get(subKey);
+        if (data.get(subKey) instanceof List) {
+            initialKeyValueList = (List<?>) data.get(subKey);
             if (initialKeyValueList != null) {
                 initialKeyValueShow = initialKeyValueList.get(initialKeyValueIndex).toString();
             } else {
@@ -144,7 +150,11 @@ public class ChangeKey {
                     } else {
                         throw new IllegalArgumentException("Unsupported type");
                     }
-                    yaml.dump(data);
+                    try {
+                        yaml.dump(data, new FileWriter(file));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     if (completeFunction != null) {
                         completeFunction.accept(player, text);
                     }
@@ -173,7 +183,8 @@ public class ChangeKey {
         newList.set(newList.indexOf(initialKeyValueShow), (type) text);
         data.put(subKey, newList);
     }
-    public static class ChangeKeyBuilder() {
+
+    public static class ChangeKeyBuilder {
         //Required
         private final Yaml yaml;
         private final String subKey;

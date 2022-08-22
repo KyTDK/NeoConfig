@@ -19,17 +19,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.neomechanical.neoconfig.config.YamlUtils.getConfigurationSection;
-import static com.neomechanical.neoconfig.config.YamlUtils.isConfigurationSection;
+import static com.neomechanical.neoutils.config.yaml.YamlKeys.getKeys;
+import static com.neomechanical.neoutils.config.yaml.YamlUtils.getConfigurationSection;
+import static com.neomechanical.neoutils.config.yaml.YamlUtils.isConfigurationSection;
 
 public class ConfigMenu {
     private final Plugin plugin;
@@ -176,12 +177,7 @@ public class ConfigMenu {
     }
 
     private boolean addSubKeys(Yaml config, File file, Map<String, Object> data, InventoryGUI keyMenu, Plugin pluginEditing) {
-        List<String> keys = new ArrayList<>();
-        for (String value : data.keySet()) {
-            if (value != null) {
-                keys.add(value);
-            }
-        }
+        Set<String> keys = getKeys(false, data);
         if (keys.isEmpty()) {
             return false;
         }
@@ -202,8 +198,11 @@ public class ConfigMenu {
             ChangeKey.ChangeKeyBuilder changeKeyBuilder = new ChangeKey.ChangeKeyBuilder(config, subKey, file, data, plugin);
             changeKeyBuilder.setCompleteFunction(completeFunction);
             changeKeyBuilder.setCloseFunction(closeFunction);
-            changeKeyBuilder.
-            InventoryItem inventoryItem = new InventoryItem(item, (event) -> changeKey.action(event), null);
+            changeKeyBuilder.setPerm(perm2);
+            changeKeyBuilder.setTitle(title);
+            changeKeyBuilder.setRestoreInventory(keyMenu);
+            changeKeyBuilder.setPermMessage(permMessage);
+            InventoryItem inventoryItem = new InventoryItem(item, (event) -> changeKeyBuilder.build().action(event), null);
             keyMenu.addItem(inventoryItem);
         }
         return true;
