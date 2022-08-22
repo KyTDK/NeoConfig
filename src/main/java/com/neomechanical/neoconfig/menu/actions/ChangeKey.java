@@ -92,7 +92,7 @@ public class ChangeKey {
                         throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
                     }
                     try {
-                        YamlUtils.save(yaml, file, data);
+                        YamlUtils.save(file, data);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -151,7 +151,7 @@ public class ChangeKey {
                         throw new IllegalArgumentException("Unsupported type");
                     }
                     try {
-                        YamlUtils.save(yaml, file, data);
+                        YamlUtils.save(file, data);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
