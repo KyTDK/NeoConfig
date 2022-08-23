@@ -6,14 +6,14 @@ import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryItem;
 import com.neomechanical.neoutils.items.ItemUtil;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,12 +22,11 @@ public class ListEditor {
     //Required
     private final Player player;
     private final Plugin pluginInstance;
-    private final ChangeKey changeKey;
     private final List<?> initialKeyValue;
     private final String subKey;
-    private final Yaml config;
+    private final FileConfiguration config;
     private final File file;
-    private final Map<String, Object> key;
+    private final ConfigurationSection key;
     private final InventoryGUI restoreInventory;
 
     //Optional
@@ -41,7 +40,6 @@ public class ListEditor {
         this.player = listEditorBuilder.player;
         this.pluginInstance = listEditorBuilder.pluginInstance;
         this.initialKeyValue = listEditorBuilder.initialKeyValue;
-        this.changeKey = listEditorBuilder.changeKey;
         this.subKey = listEditorBuilder.subKey;
         this.config = listEditorBuilder.config;
         this.file = listEditorBuilder.file;
@@ -70,7 +68,7 @@ public class ListEditor {
         return subKey;
     }
 
-    public Yaml getConfig() {
+    public FileConfiguration getConfig() {
         return config;
     }
 
@@ -78,7 +76,7 @@ public class ListEditor {
         return file;
     }
 
-    public Map<String, Object> getKey() {
+    public ConfigurationSection getKey() {
         return key;
     }
 
@@ -121,6 +119,8 @@ public class ListEditor {
                         (event) -> InventoryUtil.openInventory(player, restoreInventory), null);
                 inventoryToHandle.setItem(0, close);
             }
+            ChangeKey changeKey = new ChangeKey(subKey, config, file, key,
+                    elementalGUI, completeFunction, closeFunction, perm, title, permMessage, pluginInstance);
             //inventoryToHandle is an empty page
             InventoryItem edit = new InventoryItem(ItemUtil.createItem(Material.TRIPWIRE_HOOK, "&aEdit '" + object.toString() + "'"),
                     (event) -> changeKey.actionList(event, initialKeyValue.indexOf(object)), null);
@@ -132,11 +132,11 @@ public class ListEditor {
                 } else {
                     close = (event) -> new OpenInventory(pages.get(pages.indexOf(inventoryToHandle) - 1)).action(event);
                 }
-                InventoryItem left = new InventoryItem(ItemUtil.createItem(Material.OAK_BUTTON, "&aLeft"), close, null);
+                InventoryItem left = new InventoryItem(ItemUtil.createItem(Material.DARK_OAK_BUTTON, "&aLeft"), close, null);
                 inventoryToHandle.setItem(0, left);
             }
             if (initialKeyValue.indexOf(object) != initialKeyValue.size() - 1) {
-                InventoryItem right = new InventoryItem(ItemUtil.createItem(Material.OAK_BUTTON, "&aRight"),
+                InventoryItem right = new InventoryItem(ItemUtil.createItem(Material.DARK_OAK_BUTTON, "&aRight"),
                         (event) -> InventoryUtil.openInventory(player, pages.get(pages.indexOf(inventoryToHandle) + 1)), null);
                 inventoryToHandle.setItem(8, right);
             }
@@ -150,14 +150,13 @@ public class ListEditor {
 
     public static class ListEditorBuilder {
         //Required
-        private final Player player;
-        private final Plugin pluginInstance;
-        private final ChangeKey changeKey;
-        private final List<?> initialKeyValue;
-        private final String subKey;
-        private final Yaml config;
-        private final File file;
-        private final Map<String, Object> key;
+        private Player player;
+        private Plugin pluginInstance;
+        private List<?> initialKeyValue;
+        private String subKey;
+        private FileConfiguration config;
+        private File file;
+        private ConfigurationSection key;
         private InventoryGUI restoreInventory;
 
         //Optional
@@ -167,11 +166,10 @@ public class ListEditor {
         private String perm;
         private Supplier<String> permMessage;
 
-        public ListEditorBuilder(Player player, Plugin pluginInstance, ChangeKey changeKey, List<?> initialKeyValue, String subKey, Yaml config, File file, Map<String, Object> key,
+        public ListEditorBuilder(Player player, Plugin pluginInstance, List<?> initialKeyValue, String subKey, FileConfiguration config, File file, ConfigurationSection key,
                                  InventoryGUI restoreInventory) {
             this.player = player;
             this.pluginInstance = pluginInstance;
-            this.changeKey = changeKey;
             this.initialKeyValue = initialKeyValue;
             this.subKey = subKey;
             this.config = config;
@@ -179,6 +177,42 @@ public class ListEditor {
             this.key = key;
             this.restoreInventory = restoreInventory;
         }
+
+        public ListEditorBuilder setPlayer(Player player) {
+            this.player = player;
+            return this;
+        }
+
+        public ListEditorBuilder setPluginInstance(Plugin pluginInstance) {
+            this.pluginInstance = pluginInstance;
+            return this;
+        }
+
+        public ListEditorBuilder setInitialKeyValue(List<?> initialKeyValue) {
+            this.initialKeyValue = initialKeyValue;
+            return this;
+        }
+
+        public ListEditorBuilder setSubKey(String subKey) {
+            this.subKey = subKey;
+            return this;
+        }
+
+        public ListEditorBuilder setConfig(FileConfiguration config) {
+            this.config = config;
+            return this;
+        }
+
+        public ListEditorBuilder setFile(File file) {
+            this.file = file;
+            return this;
+        }
+
+        public ListEditorBuilder setKey(ConfigurationSection key) {
+            this.key = key;
+            return this;
+        }
+
         public ListEditorBuilder setRestoreInventory(InventoryGUI restoreInventory) {
             this.restoreInventory = restoreInventory;
             return this;
