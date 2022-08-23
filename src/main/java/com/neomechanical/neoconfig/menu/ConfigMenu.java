@@ -92,12 +92,15 @@ public class ConfigMenu {
 
         //Create plugin menu with all the keys
         InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
-        if (addFiles(pluginMenu, p.getDataFolder().listFiles())) {
-            //Add pluginMenu item to main menu
-            InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(pluginMenu).action(event), null);
-            menu.addItem(inventoryItem);
+        File[] files = p.getDataFolder().listFiles();
+        if (files!=null&&files.length != 0) {
+            if (addFiles(pluginMenu, files)) {
+                //Add pluginMenu item to main menu
+                InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(pluginMenu).action(event), null);
+                menu.addItem(inventoryItem);
+            }
+            pluginMenu.setOpenOnClose(menu);
         }
-        pluginMenu.setOpenOnClose(menu);
     }
 
     //PluginMenu contains all the plugins interface items
@@ -128,12 +131,12 @@ public class ConfigMenu {
 
     private void addFile(File file, InventoryGUI pluginMenu) {
         if (file.getName().endsWith(".yml")) {
-            YamlConfSection data;
+            YamlConfSection dataMain;
             try {
                 Yaml config = new Yaml();
                 InputStream targetStream = new FileInputStream(file);
                 Map<String, Object> dataRaw = config.load(targetStream);
-                data = new YamlConfSection(file.getName(), dataRaw);
+                dataMain = new YamlConfSection(file.getName(), dataRaw);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -142,17 +145,17 @@ public class ConfigMenu {
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
-            if (addKeys(data, data.data, file, keysMenu, plugin)) {
+            if (addKeys(dataMain, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
                 InventoryItem ymlFile = new InventoryItem(item, (event) -> new OpenInventory(keysMenu).action(event), null);
                 pluginMenu.addItem(ymlFile);
             }
             // Add YAML fields
-            addSubKeys(file, data, data.data, keysMenu, plugin);
+            addSubKeys(file, dataMain, dataMain.data, keysMenu, plugin);
         }
     }
 
-    private boolean addKeys(YamlConfSection configurationSection, Map<String, Object> dataMain,
+    private boolean addKeys(YamlConfSection configurationSection,
                             File file, InventoryGUI configYMLMenu, Plugin pluginEditing) {
         ArrayList<YamlConfSection> keys = getConfigurationSections(configurationSection.data);
         if (keys == null) {
@@ -187,7 +190,7 @@ public class ConfigMenu {
         for (String subKey : keys) {
             YamlConfSection configSection = getConfigurationSection(dataSect.data, subKey);
             if (isConfigurationSection(dataSect.data, subKey) && configSection != null) {
-                addKeys(configSection, dataMain, file, keyMenu, pluginEditing);
+                addKeys(configSection, file, keyMenu, pluginEditing);
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
