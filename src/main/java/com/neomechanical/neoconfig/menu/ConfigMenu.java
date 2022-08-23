@@ -1,6 +1,7 @@
 package com.neomechanical.neoconfig.menu;
 
 import com.neomechanical.neoconfig.menu.actions.ChangeKey;
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.config.ConfigUtil;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.actions.OpenInventory;
@@ -126,7 +127,15 @@ public class ConfigMenu {
 
     private void addFile(File file, InventoryGUI pluginMenu) {
         if (file.getName().endsWith(".yml")) {
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            FileConfiguration config = null;
+            try {
+                config = YamlConfiguration.loadConfiguration(file);
+            } catch (Exception ignore) {
+                NeoUtils.getInstance().getFancyLogger().info("Error in config: " + ignore);
+            }
+            if (config == null) {
+                return;
+            }
             //Create YML item with all keys
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);

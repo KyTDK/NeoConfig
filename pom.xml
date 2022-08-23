@@ -97,6 +97,9 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -172,17 +175,10 @@
         </dependency>
         <!-- NeoUtils -->
         <dependency>
-            <groupId>com.github.KyTDK</groupId>
+            <groupId>com.neomechanical</groupId>
             <artifactId>NeoUtils</artifactId>
-            <version>4.0</version>
+            <version>6.9</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>com.github.KyTDK</groupId>
-            <artifactId>NeoUtils</artifactId>
-            <version>3.0</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui</artifactId>
