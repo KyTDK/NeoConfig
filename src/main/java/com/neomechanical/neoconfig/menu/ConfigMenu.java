@@ -142,13 +142,13 @@ public class ConfigMenu {
             InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
             keysMenu.setOpenOnClose(pluginMenu);
             //Add Key items to configYMLMenu
-            if (addKeys(data, file, keysMenu, plugin)) {
+            if (addKeys(data, data.data, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
                 InventoryItem ymlFile = new InventoryItem(item, (event) -> new OpenInventory(keysMenu).action(event), null);
                 pluginMenu.addItem(ymlFile);
             }
             // Add YAML fields
-            addSubKeys(file, data, keysMenu, plugin);
+            addSubKeys(file, data, data.data, keysMenu, plugin);
         }
     }
 
@@ -170,7 +170,7 @@ public class ConfigMenu {
             //Create GUI for all the keys
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, keyName);
             keyMenu.setOpenOnClose(configYMLMenu);
-            if (addSubKeys(file, key, keyMenu, pluginEditing)) {
+            if (addSubKeys(file, configurationSection, key.data, keyMenu, pluginEditing)) {
                 InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(keyMenu).action(event), null);
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
@@ -187,7 +187,7 @@ public class ConfigMenu {
         for (String subKey : keys) {
             YamlConfSection configSection = getConfigurationSection(dataSect.data, subKey);
             if (isConfigurationSection(dataSect.data, subKey) && configSection != null) {
-                addKeys(configSection, file, keyMenu, pluginEditing);
+                addKeys(configSection, dataMain, file, keyMenu, pluginEditing);
                 continue;
             }
             ItemStack item = ItemUtil.createItem(Material.TRIPWIRE_HOOK, ChatColor.RESET + subKey);
