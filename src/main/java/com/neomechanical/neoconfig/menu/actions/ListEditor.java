@@ -1,10 +1,12 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.actions.OpenInventory;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryItem;
 import com.neomechanical.neoutils.items.ItemUtil;
+import com.neomechanical.neoutils.version.items.ItemVersionWrapper;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -110,21 +112,37 @@ public class ListEditor {
         List<InventoryGUI> pages = elementalGUI.getPages();
         for (Object object : initialKeyValue) {
             InventoryGUI inventoryToHandle;
+            int initialKeyValueIndex = initialKeyValue.indexOf(object);
             if (!pages.isEmpty()) {
                 //Get the last page in the list
                 inventoryToHandle = pages.get(pages.size() - 1);
             } else {
                 inventoryToHandle = elementalGUI;
-                InventoryItem close = new InventoryItem(ItemUtil.createItem(Material.BARRIER, "&cClose"),
+                InventoryItem close = new InventoryItem(() -> ItemUtil.createItem(Material.BARRIER, "&cClose"),
                         (event) -> InventoryUtil.openInventory(player, restoreInventory), null);
                 inventoryToHandle.setItem(0, close);
             }
             ChangeKey changeKey = new ChangeKey(subKey, config, file, key,
                     elementalGUI, completeFunction, closeFunction, perm, title, permMessage, pluginInstance);
             //inventoryToHandle is an empty page
-            InventoryItem edit = new InventoryItem(ItemUtil.createItem(Material.TRIPWIRE_HOOK, "&aEdit '" + object.toString() + "'"),
-                    (event) -> changeKey.actionList(event, initialKeyValue.indexOf(object)), null);
+            InventoryItem edit = new InventoryItem(() -> {
+                List<?> initialKeyValueList;
+                String initialKeyValueShow;
+                if (key.get(subKey) instanceof List) {
+                    initialKeyValueList = (List<?>) key.get(subKey);
+                    if (initialKeyValueList != null) {
+                        initialKeyValueShow = initialKeyValueList.get(initialKeyValueIndex).toString();
+                    } else {
+                        initialKeyValueShow = object.toString();
+                    }
+                } else {
+                    initialKeyValueShow = object.toString();
+                }
+                return ItemUtil.createItem(Material.TRIPWIRE_HOOK, "&aEdit '" + initialKeyValueShow + "'");
+            },
+                    (event) -> changeKey.actionList(event, initialKeyValueIndex), null);
             inventoryToHandle.setItem(4, edit);
+            Material button = ((ItemVersionWrapper) NeoUtils.getInternalVersions().get("items")).oakButton();
             if (!pages.isEmpty()) {
                 Consumer<InventoryClickEvent> close;
                 if (pages.size() == 1) {
@@ -132,11 +150,11 @@ public class ListEditor {
                 } else {
                     close = (event) -> new OpenInventory(pages.get(pages.indexOf(inventoryToHandle) - 1)).action(event);
                 }
-                InventoryItem left = new InventoryItem(ItemUtil.createItem(Material.DARK_OAK_BUTTON, "&aLeft"), close, null);
+                InventoryItem left = new InventoryItem(() -> ItemUtil.createItem(button, "&aLeft"), close, null);
                 inventoryToHandle.setItem(0, left);
             }
             if (initialKeyValue.indexOf(object) != initialKeyValue.size() - 1) {
-                InventoryItem right = new InventoryItem(ItemUtil.createItem(Material.DARK_OAK_BUTTON, "&aRight"),
+                InventoryItem right = new InventoryItem(() -> ItemUtil.createItem(button, "&aRight"),
                         (event) -> InventoryUtil.openInventory(player, pages.get(pages.indexOf(inventoryToHandle) + 1)), null);
                 inventoryToHandle.setItem(8, right);
             }

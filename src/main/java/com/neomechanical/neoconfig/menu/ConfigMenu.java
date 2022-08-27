@@ -1,7 +1,6 @@
 package com.neomechanical.neoconfig.menu;
 
 import com.neomechanical.neoconfig.menu.actions.ChangeKey;
-import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.config.ConfigUtil;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.actions.OpenInventory;
@@ -93,7 +92,7 @@ public class ConfigMenu {
         InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
         if (addFiles(pluginMenu, p.getDataFolder().listFiles())) {
             //Add pluginMenu item to main menu
-            InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(pluginMenu).action(event), null);
+            InventoryItem inventoryItem = new InventoryItem(() -> item, (event) -> new OpenInventory(pluginMenu).action(event), null);
             menu.addItem(inventoryItem);
         }
         pluginMenu.setOpenOnClose(menu);
@@ -115,7 +114,7 @@ public class ConfigMenu {
                 InventoryGUI directory = InventoryUtil.createInventoryGUI(null, 54, file.getName());
                 directory.setOpenOnClose(pluginMenu);
                 addFiles(directory, dirFiles);
-                pluginMenu.addItem(new InventoryItem(ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()),
+                pluginMenu.addItem(new InventoryItem(() -> ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()),
                         (event) -> new OpenInventory(directory).action(event), null));
                 continue;
             }
@@ -131,7 +130,6 @@ public class ConfigMenu {
             try {
                 config = YamlConfiguration.loadConfiguration(file);
             } catch (Exception ignore) {
-                NeoUtils.getInstance().getFancyLogger().info("Error in config: " + ignore);
             }
             if (config == null) {
                 return;
@@ -142,7 +140,7 @@ public class ConfigMenu {
             //Add Key items to configYMLMenu
             if (addKeys(config, config, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
-                InventoryItem ymlFile = new InventoryItem(item, (event) -> new OpenInventory(keysMenu).action(event), null);
+                InventoryItem ymlFile = new InventoryItem(() -> item, (event) -> new OpenInventory(keysMenu).action(event), null);
                 pluginMenu.addItem(ymlFile);
             }
             // Add YAML fields
@@ -165,7 +163,7 @@ public class ConfigMenu {
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
             keyMenu.setOpenOnClose(configYMLMenu);
             if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
-                InventoryItem inventoryItem = new InventoryItem(item, (event) -> new OpenInventory(keyMenu).action(event), null);
+                InventoryItem inventoryItem = new InventoryItem(() -> item, (event) -> new OpenInventory(keyMenu).action(event), null);
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
             }
@@ -190,9 +188,8 @@ public class ConfigMenu {
                 perm2 = perm;
             } else {
                 perm2 = "neoconfig.edit." + pluginEditing.getName();
-
             }
-            InventoryItem inventoryItem = new InventoryItem(item, (event) -> new ChangeKey(subKey, config, file, key, keyMenu,
+            InventoryItem inventoryItem = new InventoryItem(() -> item, (event) -> new ChangeKey(subKey, config, file, key, keyMenu,
                     completeFunction, closeFunction, perm2, title, permMessage, plugin).action(event), null);
             keyMenu.addItem(inventoryItem);
         }
