@@ -1,6 +1,8 @@
 package com.neomechanical.neoconfig.menu;
 
+import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoconfig.menu.actions.ChangeKey;
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.config.ConfigUtil;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.actions.OpenInventory;
@@ -40,6 +42,9 @@ public class ConfigMenu {
     }
 
     private InventoryGUI generateMenu(@Nullable Plugin plugin) {
+        if (NeoUtils.getInstance() == null) {
+            NeoUtils.initialize(NeoConfig.getInstance());
+        }
         if (plugin != null) {
             //Create plugin menu with all the keys
             InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
