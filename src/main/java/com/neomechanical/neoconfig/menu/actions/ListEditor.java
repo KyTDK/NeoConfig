@@ -160,7 +160,7 @@ public class ListEditor {
             }
             //Create a new empty page if there is another object next
             if (initialKeyValue.indexOf(object) != initialKeyValue.size() - 1) {
-                pages.add(InventoryUtil.createInventoryGUI(player, elementalGUI.getSize(), elementalGUI.getTitle()));
+                elementalGUI.addPage(InventoryUtil.createInventoryGUI(player, elementalGUI.getSize(), elementalGUI.getTitle()));
             }
         }
         InventoryUtil.openInventory(player, elementalGUI);
