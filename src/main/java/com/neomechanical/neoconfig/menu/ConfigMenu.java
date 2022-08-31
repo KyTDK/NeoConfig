@@ -29,8 +29,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class ConfigMenu {
-    private final Plugin plugin;
-    private Plugin pluginEditing;
+    private Plugin plugin;
+    private Plugin pluginEditing = null;
     private BiConsumer<Player, String> completeFunction;
     private String perm = null;
     private String title = "Change key";
@@ -46,9 +46,10 @@ public class ConfigMenu {
             NeoUtils.initializeAll((JavaPlugin) plugin);
         }
         if (pluginEditing != null) {
+            plugin = pluginEditing;
             //Create plugin menu with all the keys
-            InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, plugin.getName());
-            if (addFiles(pluginMenu, plugin.getDataFolder().listFiles())) {
+            InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, pluginEditing.getName());
+            if (addFiles(pluginMenu, pluginEditing.getDataFolder().listFiles())) {
                 //Add pluginMenu item to main menu
                 return pluginMenu;
             }
