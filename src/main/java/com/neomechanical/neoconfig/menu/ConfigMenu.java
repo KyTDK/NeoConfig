@@ -1,6 +1,5 @@
 package com.neomechanical.neoconfig.menu;
 
-import com.neomechanical.neoconfig.NeoConfig;
 import com.neomechanical.neoconfig.menu.actions.ChangeKey;
 import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.config.ConfigUtil;
@@ -18,7 +17,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Arrays;
@@ -41,9 +40,9 @@ public class ConfigMenu {
         this.plugin = plugin;
     }
 
-    private InventoryGUI generateMenu(@Nullable Plugin plugin) {
+    private InventoryGUI generateMenu() {
         if (NeoUtils.getInstance() == null) {
-            NeoUtils.initialize(NeoConfig.getInstance());
+            NeoUtils.initializeAll((JavaPlugin) plugin);
         }
         if (plugin != null) {
             //Create plugin menu with all the keys
@@ -85,8 +84,8 @@ public class ConfigMenu {
         return this;
     }
 
-    public void open(Player player, @Nullable Plugin plugin) {
-        InventoryGUI menu = generateMenu(plugin);
+    public void open(Player player) {
+        InventoryGUI menu = generateMenu();
         InventoryUtil.openInventory(player, menu);
     }
 

@@ -42,7 +42,7 @@ public class ConfigCommand extends Command {
         configMenu.onComplete((playerAsAuthor, text) -> NeoConfig.reload())
                 .permission("neoconfig.config",
                         () -> NeoUtils.getManagers().getLanguageManager().getString("commandGeneric.errorNoPermission", null))
-                .open(playerAsPlayer, NeoConfig.getInstance());
+                .open(playerAsPlayer);
     }
 
     @Override

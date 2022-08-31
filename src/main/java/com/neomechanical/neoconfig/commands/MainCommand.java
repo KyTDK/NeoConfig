@@ -42,7 +42,7 @@ public class MainCommand extends Command {
         new ConfigMenu(NeoConfig.getInstance())
                 .permission(null,
                         () -> NeoUtils.getManagers().getLanguageManager().getString("commandGeneric.errorNoPermission", null))
-                .open(playerAsPlayer, null);
+                .open(playerAsPlayer);
     }
 
     @Override
