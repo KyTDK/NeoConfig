@@ -130,7 +130,7 @@ public class ConfigMenu {
                 addFiles(directory, dirFiles);
                 InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
                         () -> ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()))
-                        .setAction((event) -> new OpenInventory(pluginMenu).action(event))
+                        .setAction((event) -> new OpenInventory(directory).action(event))
                         .build();
                 pluginMenu.addItem(inventoryItem);
                 continue;
