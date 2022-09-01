@@ -103,7 +103,10 @@ public class ConfigMenu {
         InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
         if (addFiles(pluginMenu, p.getDataFolder().listFiles())) {
             //Add pluginMenu item to main menu
-            InventoryItem inventoryItem = new InventoryItem(() -> item, (event) -> new OpenInventory(pluginMenu).action(event), null);
+            InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
+                    () -> item)
+                    .setAction((event) -> new OpenInventory(pluginMenu).action(event))
+                    .build();
             menu.addItem(inventoryItem);
         }
         pluginMenu.setOpenOnClose(menu);
@@ -125,8 +128,11 @@ public class ConfigMenu {
                 InventoryGUI directory = InventoryUtil.createInventoryGUI(null, 54, file.getName());
                 directory.setOpenOnClose(pluginMenu);
                 addFiles(directory, dirFiles);
-                pluginMenu.addItem(new InventoryItem(() -> ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()),
-                        (event) -> new OpenInventory(directory).action(event), null));
+                InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
+                        () -> ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()))
+                        .setAction((event) -> new OpenInventory(pluginMenu).action(event))
+                        .build();
+                pluginMenu.addItem(inventoryItem);
                 continue;
             }
             // Add all yml files inside the plugin data folder (excluding directories)
@@ -151,7 +157,10 @@ public class ConfigMenu {
             //Add Key items to configYMLMenu
             if (addKeys(config, config, file, keysMenu, plugin)) {
                 ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
-                InventoryItem ymlFile = new InventoryItem(() -> item, (event) -> new OpenInventory(keysMenu).action(event), null);
+                InventoryItem ymlFile = new InventoryItem.InventoryItemBuilder(
+                        () -> item)
+                        .setAction((event) -> new OpenInventory(keysMenu).action(event))
+                        .build();
                 pluginMenu.addItem(ymlFile);
             }
             // Add YAML fields
@@ -174,7 +183,10 @@ public class ConfigMenu {
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
             keyMenu.setOpenOnClose(configYMLMenu);
             if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
-                InventoryItem inventoryItem = new InventoryItem(() -> item, (event) -> new OpenInventory(keyMenu).action(event), null);
+                InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
+                        () -> item)
+                        .setAction((event) -> new OpenInventory(keyMenu).action(event))
+                        .build();
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
             }
@@ -200,8 +212,11 @@ public class ConfigMenu {
             } else {
                 perm2 = "neoconfig.edit." + pluginEditing.getName();
             }
-            InventoryItem inventoryItem = new InventoryItem(() -> item, (event) -> new ChangeKey(subKey, config, file, key, keyMenu,
-                    completeFunction, closeFunction, perm2, title, permMessage, plugin).action(event), null);
+            InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
+                    () -> item)
+                    .setAction((event) -> new ChangeKey(subKey, config, file, key, keyMenu,
+                            completeFunction, closeFunction, perm2, title, permMessage, plugin).action(event))
+                    .build();
             keyMenu.addItem(inventoryItem);
         }
         return true;
