@@ -147,6 +147,8 @@ public class ConfigMenu {
             try {
                 config = YamlConfiguration.loadConfiguration(file);
             } catch (Exception ignore) {
+                NeoUtils.getInstance().getFancyLogger().warn("Error deserializing " + file.getName()
+                        + ". This isn't a problem with the plugin but with the config file");
             }
             if (config == null) {
                 return;
