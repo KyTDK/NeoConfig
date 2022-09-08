@@ -86,7 +86,16 @@
                             </shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
                         </relocation>
                     </relocations>
-                    <minimizeJar>false</minimizeJar> <!-- Ensure not set to true -->
+                    <minimizeJar>true</minimizeJar> <!-- Ensure not set to true -->
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludeDefaults>false</excludeDefaults>
+                            <includes>
+                                <include>net/wesjd/anvilgui/**</include>
+                            </includes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -160,7 +169,7 @@
         <dependency>
             <groupId>com.neomechanical</groupId>
             <artifactId>NeoUtils</artifactId>
-            <version>6.9</version>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
