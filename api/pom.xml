@@ -61,11 +61,6 @@
                             <shadedPattern>com.neomechanical.neoconfig.anvilgui
                             </shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
                         </relocation>
-                        <relocation>
-                            <pattern>com.neomechanical.neoutils</pattern>
-                            <shadedPattern>com.neomechanical.neoconfig.neoutils
-                            </shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
-                        </relocation>
                     </relocations>
                 </configuration>
             </plugin>
