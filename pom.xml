@@ -6,7 +6,7 @@
 
     <groupId>com.neomechanical</groupId>
     <artifactId>NeoConfig-parent</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.3</version>
     <packaging>pom</packaging>
     <name>NeoConfig</name>
 
