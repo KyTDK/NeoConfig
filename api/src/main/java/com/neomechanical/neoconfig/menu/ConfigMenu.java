@@ -101,11 +101,14 @@ public class ConfigMenu {
 
         //Create plugin menu with all the keys
         InventoryGUI pluginMenu = InventoryUtil.createInventoryGUI(null, 54, p.getName());
-        if (addFiles(pluginMenu, p.getDataFolder().listFiles())) {
+        if (p.getDataFolder().listFiles()!=null) {
             //Add pluginMenu item to main menu
             InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
                     () -> item)
-                    .setAction((event) -> new OpenInventory(pluginMenu).action(event))
+                    .setAction((event) -> {
+                        addFiles(pluginMenu, p.getDataFolder().listFiles());
+                        pluginMenu.open((Player) event.getWhoClicked());
+                    })
                     .build();
             menu.addItem(inventoryItem);
         }
@@ -121,16 +124,19 @@ public class ConfigMenu {
             // Add all yml files in the data folder that are directories
             if (file.isDirectory()) {
                 File[] dirFiles = file.listFiles();
+                //if file is yml, then made an array of them
                 File[] ymlFiles = file.listFiles((dir, name) -> name.endsWith(".yml"));
                 if (ymlFiles != null && ymlFiles.length == 0) {
                     continue;
                 }
-                InventoryGUI directory = InventoryUtil.createInventoryGUI(null, 54, file.getName());
-                directory.setOpenOnClose(pluginMenu);
-                addFiles(directory, dirFiles);
                 InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
                         () -> ItemUtil.createItem(Material.CHEST, ChatColor.RESET + file.getName()))
-                        .setAction((event) -> new OpenInventory(directory).action(event))
+                        .setAction((event) -> {
+                            InventoryGUI directory = InventoryUtil.createInventoryGUI(null, 54, file.getName());
+                            directory.setOpenOnClose(pluginMenu);
+                            addFiles(directory, dirFiles);
+                            directory.open((Player) event.getWhoClicked());
+                        })
                         .build();
                 pluginMenu.addItem(inventoryItem);
                 continue;
@@ -140,41 +146,40 @@ public class ConfigMenu {
         }
         return true;
     }
-
+    // Adds all yml files inside the plugin data folder (excluding directories)
     private void addFile(File file, InventoryGUI pluginMenu) {
         if (file.getName().endsWith(".yml")) {
-            FileConfiguration config = null;
             try {
-                config = YamlConfiguration.loadConfiguration(file);
+                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+                //Create YML item with all keys
+                InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
+                keysMenu.setOpenOnClose(pluginMenu);
+                //Add Key items to configYMLMenu
+                if (!config.getKeys(false).isEmpty()) {
+                    ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
+                    InventoryItem ymlFile = new InventoryItem.InventoryItemBuilder(
+                            () -> item)
+                            .setAction((event) -> {
+                                addKeys(config, config, file, keysMenu, plugin);
+                                // Add YAML fields
+                                addSubKeys(config, file, config, keysMenu, plugin);
+                                keysMenu.open((Player) event.getWhoClicked());
+                            })
+                            .build();
+                    pluginMenu.addItem(ymlFile);
+                }
             } catch (Exception ignore) {
-                NeoUtils.getInstance().getFancyLogger().warn("Error deserializing " + file.getName()
-                        + ". This isn't a problem with the plugin but with the config file");
+                NeoUtils.getInstance().getFancyLogger().warn("[DO NOT REPORT THIS] Error deserializing " + file.getName()
+                        + ". This isn't a problem with the plugin but with the config file of another plugin.");
             }
-            if (config == null) {
-                return;
-            }
-            //Create YML item with all keys
-            InventoryGUI keysMenu = InventoryUtil.createInventoryGUI(null, 54, "Keys");
-            keysMenu.setOpenOnClose(pluginMenu);
-            //Add Key items to configYMLMenu
-            if (addKeys(config, config, file, keysMenu, plugin)) {
-                ItemStack item = ItemUtil.createItem(Material.BOOK, ChatColor.RESET + file.getName());
-                InventoryItem ymlFile = new InventoryItem.InventoryItemBuilder(
-                        () -> item)
-                        .setAction((event) -> new OpenInventory(keysMenu).action(event))
-                        .build();
-                pluginMenu.addItem(ymlFile);
-            }
-            // Add YAML fields
-            addSubKeys(config, file, config, keysMenu, plugin);
         }
     }
 
-    private boolean addKeys(FileConfiguration config, ConfigurationSection configurationSection, File file,
-                            InventoryGUI configYMLMenu, Plugin pluginEditing) {
+    private void addKeys(FileConfiguration config, ConfigurationSection configurationSection, File file,
+                         InventoryGUI configYMLMenu, Plugin pluginEditing) {
         ConfigurationSection[] keys = ConfigUtil.getConfigurationSections(configurationSection);
         if (configurationSection.getKeys(false).isEmpty()) {
-            return false;
+            return;
         }
         for (ConfigurationSection key : keys) {
             if (key == null || key.getKeys(false).isEmpty()) {
@@ -184,22 +189,24 @@ public class ConfigMenu {
             //Create GUI for all the keys
             InventoryGUI keyMenu = InventoryUtil.createInventoryGUI(null, 54, key.getName());
             keyMenu.setOpenOnClose(configYMLMenu);
-            if (addSubKeys(config, file, key, keyMenu, pluginEditing)) {
+            if (!key.getKeys(false).isEmpty()) {
                 InventoryItem inventoryItem = new InventoryItem.InventoryItemBuilder(
                         () -> item)
-                        .setAction((event) -> new OpenInventory(keyMenu).action(event))
+                        .setAction((event) -> {
+                            addSubKeys(config, file, key, keyMenu, pluginEditing);
+                            new OpenInventory(keyMenu).action(event);
+                        })
                         .build();
                 //Add keyMenu item to configYMLMenu
                 configYMLMenu.addItem(inventoryItem);
             }
         }
-        return true;
     }
 
-    private boolean addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu, Plugin pluginEditing) {
+    private void addSubKeys(FileConfiguration config, File file, ConfigurationSection key, InventoryGUI keyMenu, Plugin pluginEditing) {
         Set<String> keys = key.getKeys(false);
         if (keys.isEmpty()) {
-            return false;
+            return;
         }
         for (String subKey : keys) {
             ConfigurationSection section = key.getConfigurationSection(subKey);
@@ -221,6 +228,5 @@ public class ConfigMenu {
                     .build();
             keyMenu.addItem(inventoryItem);
         }
-        return true;
     }
 }
