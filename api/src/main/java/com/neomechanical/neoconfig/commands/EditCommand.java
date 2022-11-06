@@ -42,12 +42,12 @@ public class EditCommand extends Command {
         return true;
     }
 
-    private final LanguageManager languageManager = NeoUtils.getManagers().getLanguageManager();
+    private final LanguageManager languageManager = NeoUtils.getNeoUtilities().getManagers().getLanguageManager();
     @Override
     public void perform(CommandSender player, String[] args) {
         Player playerAsPlayer = (Player) player;
         if (args.length == 1) {
-            MessageUtil.sendMM(player, NeoUtils.getManagers().getLanguageManager().getString("commandGeneric.errorInvalidSyntax", null));
+            MessageUtil.sendMM(player, NeoUtils.getNeoUtilities().getManagers().getLanguageManager().getString("commandGeneric.errorInvalidSyntax", null));
             return;
         }
         Plugin plugin = Bukkit.getPluginManager().getPlugin(args[1]);

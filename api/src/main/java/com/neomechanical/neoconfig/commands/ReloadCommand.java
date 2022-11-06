@@ -38,7 +38,7 @@ public class ReloadCommand extends Command {
     @Override
     public void perform(CommandSender commandSender, String[] strings) {
         NeoConfig.reload();
-        MessageUtil.sendMM(commandSender, NeoUtils.getManagers().getLanguageManager().getString("reload.onReload", null));
+        MessageUtil.sendMM(commandSender, NeoUtils.getNeoUtilities().getManagers().getLanguageManager().getString("reload.onReload", null));
     }
 
     @Override

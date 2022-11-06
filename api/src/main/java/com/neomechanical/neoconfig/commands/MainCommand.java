@@ -41,7 +41,7 @@ public class MainCommand extends Command {
         Player playerAsPlayer = (Player) player;
         new ConfigMenu(NeoConfig.getInstance())
                 .permission(null,
-                        () -> NeoUtils.getManagers().getLanguageManager().getString("commandGeneric.errorNoPermission", null))
+                        () -> NeoUtils.getNeoUtilities().getManagers().getLanguageManager().getString("commandGeneric.errorNoPermission", null))
                 .open(playerAsPlayer);
     }
 

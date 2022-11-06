@@ -144,7 +144,7 @@ public class ListEditor {
             }).setAction((event) -> changeKey.actionList(event, initialKeyValueIndex))
                     .build();
             inventoryToHandle.setItem(4, edit);
-            Material button = ((ItemVersionWrapper) NeoUtils.getInternalVersions().get("items")).oakButton();
+            Material button = ((ItemVersionWrapper) NeoUtils.getNeoUtilities().getInternalVersions().get("items")).oakButton();
             if (!pages.isEmpty()) {
                 Consumer<InventoryClickEvent> close;
                 if (pages.size() == 1) {

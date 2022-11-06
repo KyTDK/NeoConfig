@@ -8,7 +8,7 @@ import com.neomechanical.neoutils.languages.LanguageManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class RegisterCommands {
-    private static final LanguageManager languageManager = NeoUtils.getManagers().getLanguageManager();
+    private static final LanguageManager languageManager = NeoUtils.getNeoUtilities().getManagers().getLanguageManager();
     private final JavaPlugin plugin;
 
     public RegisterCommands(JavaPlugin plugin) {

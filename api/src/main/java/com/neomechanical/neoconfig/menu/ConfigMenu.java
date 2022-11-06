@@ -21,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -42,9 +43,6 @@ public class ConfigMenu {
     }
 
     private InventoryGUI generateMenu() {
-        if (NeoUtils.getInstance() == null) {
-            NeoUtils.initializeAll((JavaPlugin) plugin);
-        }
         if (pluginEditing != null) {
             plugin = pluginEditing;
             //Create plugin menu with all the keys
@@ -60,6 +58,7 @@ public class ConfigMenu {
         for (Plugin p : plugins) {
             createPluginItem(p, menu);
         }
+
         return menu;
     }
 
@@ -169,7 +168,7 @@ public class ConfigMenu {
                     pluginMenu.addItem(ymlFile);
                 }
             } catch (Exception ignore) {
-                NeoUtils.getInstance().getFancyLogger().warn("[DO NOT REPORT THIS] Error deserializing " + file.getName()
+                NeoUtils.getNeoUtilities().getFancyLogger().warn("[DO NOT REPORT THIS] Error deserializing " + file.getName()
                         + ". This isn't a problem with the plugin but with the config file of another plugin.");
             }
         }

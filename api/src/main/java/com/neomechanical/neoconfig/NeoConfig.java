@@ -7,10 +7,11 @@ import com.neomechanical.neoutils.languages.LanguageManager;
 import com.neomechanical.neoutils.manager.ManagerHandler;
 import com.neomechanical.neoutils.updates.UpdateChecker;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.neomechanical.neoutils.updates.IsUpToDate.isUpToDate;
 
-public final class NeoConfig extends NeoUtils {
+public final class NeoConfig extends JavaPlugin {
     private static NeoConfig instance;
 
     private void setInstance(NeoConfig instance) {
@@ -41,7 +42,7 @@ public final class NeoConfig extends NeoUtils {
     }
 
     @Override
-    public void onPluginDisable() {
+    public void onDisable() {
         // Plugin shutdown logic
     }
 
@@ -64,8 +65,8 @@ public final class NeoConfig extends NeoUtils {
     }
 
     @Override
-    public void onPluginEnable() {
-        managers = NeoUtils.getManagers();
+    public void onEnable() {
+        managers = NeoUtils.getNeoUtilities().getManagers();
         setInstance(this);
         // Create config
         managers.createNewConfigManager("config.yml");
