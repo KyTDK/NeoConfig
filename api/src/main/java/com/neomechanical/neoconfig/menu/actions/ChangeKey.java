@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.java.Lists;
@@ -10,10 +11,12 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -72,31 +75,24 @@ public class ChangeKey {
             return;
         }
         if (initialKeyValue.toString().length() > 50) {
-            MessageUtil.sendMM(player, "<red><bold>Key value is too long.");
+            if (initialKeyValue.toString().length() > 256) {
+                MessageUtil.sendMM(player, "<red><bold>Key value is too long.");
+                return;
+            }
+            InventoryGUI currentInventory = NeoUtils.getNeoUtilities().getManagers().getInventoryManager().getInventoryGUI(player.getOpenInventory().getTopInventory());
+            if (currentInventory!=null) {
+                currentInventory.setOpenOnClose(null);
+                currentInventory.close(player);
+            }
+            ConversationEditor conversationEditor = new ConversationEditor((JavaPlugin) pluginInstance);
+            conversationEditor.main(player, initialKeyValue, key, subKey, config, file, completeFunction, closeFunction, restoreInventory);
             return;
         }
         new AnvilGUI.Builder()
-                .onComplete((playerAuthor, text) -> {                                    //called when the inventory output slot is clicked
-                    if (initialKeyValue instanceof String) {
-                        key.set(subKey, text);
-                    } else if (initialKeyValue instanceof Integer) {
-                        key.set(subKey, Integer.parseInt(text));
-                    } else if (initialKeyValue instanceof Double) {
-                        key.set(subKey, Double.parseDouble(text));
-                    } else if (initialKeyValue instanceof Boolean) {
-                        key.set(subKey, Boolean.parseBoolean(text));
-                    } else {
-                        throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
-                    }
-                    try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    if (completeFunction != null) {
-                        completeFunction.accept(player, text);
-                    }
-                    return AnvilGUI.Response.close();
+                .onComplete(completion -> {                                    //called when the inventory output slot is clicked
+                    String text = completion.getText();
+                    setKey(initialKeyValue, key, subKey, text, config, file, completeFunction, player);
+                    return Collections.singletonList(AnvilGUI.ResponseAction.close());
                 })
                 .title(title)
                 .onClose(playerAuthor -> {//called when the inventory is closed
@@ -133,7 +129,8 @@ public class ChangeKey {
             return;
         }
         new AnvilGUI.Builder()
-                .onComplete((playerAuthor, text) -> {//called when the inventory output slot is clicked
+                .onComplete(completion -> {//called when the inventory output slot is clicked
+                    String text = completion.getText();
                     if (initialKeyValueList.get(0) instanceof String) {
                         updateList(initialKeyValueShow, initialKeyValueList, text);
                     } else if (initialKeyValueList.get(0) instanceof Integer) {
@@ -153,7 +150,7 @@ public class ChangeKey {
                     if (completeFunction != null) {
                         completeFunction.accept(player, text);
                     }
-                    return AnvilGUI.Response.close();
+                    return Collections.singletonList(AnvilGUI.ResponseAction.close());
                 })
                 .title(title)
                 .onClose(playerAuthor -> {//called when the inventory is closed
@@ -177,5 +174,29 @@ public class ChangeKey {
         List<type> newList = Lists.cast(initialKeyValueList);
         newList.set(newList.indexOf(initialKeyValueShow), (type) text);
         key.set(subKey, newList);
+    }
+
+    public static void setKey(Object initialKeyValue, ConfigurationSection key, String subKey,
+                              String text, FileConfiguration config, File file,
+                              BiConsumer<Player, String> completeFunction, Player player) {
+        if (initialKeyValue instanceof String) {
+            key.set(subKey, text);
+        } else if (initialKeyValue instanceof Integer) {
+            key.set(subKey, Integer.parseInt(text));
+        } else if (initialKeyValue instanceof Double) {
+            key.set(subKey, Double.parseDouble(text));
+        } else if (initialKeyValue instanceof Boolean) {
+            key.set(subKey, Boolean.parseBoolean(text));
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
+        }
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (completeFunction != null) {
+            completeFunction.accept(player, text);
+        }
     }
 }
