@@ -74,18 +74,7 @@ public class ChangeKey {
                     .open();
             return;
         }
-        if (initialKeyValue.toString().length() > 50) {
-            if (initialKeyValue.toString().length() > 256) {
-                MessageUtil.sendMM(player, "<red><bold>Key value is too long.");
-                return;
-            }
-            InventoryGUI currentInventory = NeoUtils.getNeoUtilities().getManagers().getInventoryManager().getInventoryGUI(player.getOpenInventory().getTopInventory());
-            if (currentInventory!=null) {
-                currentInventory.setOpenOnClose(null);
-                currentInventory.close(player);
-            }
-            ConversationEditor conversationEditor = new ConversationEditor((JavaPlugin) pluginInstance);
-            conversationEditor.main(player, initialKeyValue, key, subKey, config, file, completeFunction, closeFunction, restoreInventory);
+        if (!isSafeToEdit(initialKeyValue, player)) {
             return;
         }
         new AnvilGUI.Builder()
@@ -126,6 +115,9 @@ public class ChangeKey {
             }
         } else {
             MessageUtil.sendMM(player, getLanguageManager().getString("generic.errorUnknown", null));
+            return;
+        }
+        if (!isSafeToEdit(initialKeyValueShow, player)) {
             return;
         }
         new AnvilGUI.Builder()
@@ -198,5 +190,27 @@ public class ChangeKey {
         if (completeFunction != null) {
             completeFunction.accept(player, text);
         }
+    }
+    /**
+     *
+     * @param initialKeyValue object
+     * @param player Player
+     * @return If it safe to continue, if not it will return false and handle it accordingly
+     */
+    private boolean isSafeToEdit(Object initialKeyValue, Player player) {
+        if (initialKeyValue.toString().length() > 50) {
+            if (initialKeyValue.toString().length() > 256) {
+                MessageUtil.sendMM(player, "<red><bold>Key value is too long.");
+                return false;
+            }
+            InventoryGUI currentInventory = NeoUtils.getNeoUtilities().getManagers().getInventoryManager().getInventoryGUI(player.getOpenInventory().getTopInventory());
+            if (currentInventory!=null) {
+                currentInventory.close(player);
+            }
+            ConversationEditor conversationEditor = new ConversationEditor((JavaPlugin) pluginInstance);
+            conversationEditor.main(player, initialKeyValue, key, subKey, config, file, completeFunction, closeFunction, restoreInventory);
+            return false;
+        }
+        return true;
     }
 }
