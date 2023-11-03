@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -78,19 +79,23 @@ public class ChangeKey {
             return;
         }
         new AnvilGUI.Builder()
-                .onComplete(completion -> {                                    //called when the inventory output slot is clicked
-                    String text = completion.getText();
+                .onClick((slot, stateSnapshot) -> {
+                    if(slot != AnvilGUI.Slot.OUTPUT) {
+                        return Collections.emptyList();
+                    }
+                    String text = stateSnapshot.getText();
                     setKey(initialKeyValue, key, subKey, text, config, file, completeFunction, player);
                     return Collections.singletonList(AnvilGUI.ResponseAction.close());
                 })
                 .title(title)
-                .onClose(playerAuthor -> {//called when the inventory is closed
+                .onClose(stateSnapshot -> {//called when the inventory is closed
                     if (closeFunction != null) {
                         closeFunction.accept(player);
                     }
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+                            Player playerAuthor = stateSnapshot.getPlayer();
                             InventoryUtil.openInventory(playerAuthor, restoreInventory);
                         }
                     }.runTaskLater(pluginInstance, 1L);
@@ -120,8 +125,8 @@ public class ChangeKey {
         if (!isSafeToEdit(initialKeyValueShow, player)) {
             return;
         }
-        new AnvilGUI.Builder()
-                .onComplete(completion -> {//called when the inventory output slot is clicked
+        new AnvilGUI.Builder().
+                onClose(completion -> {//called when the inventory output slot is clicked
                     String text = completion.getText();
                     if (initialKeyValueList.get(0) instanceof String) {
                         updateList(initialKeyValueShow, initialKeyValueList, text);
@@ -142,16 +147,16 @@ public class ChangeKey {
                     if (completeFunction != null) {
                         completeFunction.accept(player, text);
                     }
-                    return Collections.singletonList(AnvilGUI.ResponseAction.close());
                 })
                 .title(title)
-                .onClose(playerAuthor -> {//called when the inventory is closed
+                .onClose(stateSnapshot -> {//called when the inventory is closed
                     if (closeFunction != null) {
                         closeFunction.accept(player);
                     }
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+                            Player playerAuthor = stateSnapshot.getPlayer();
                             InventoryUtil.openInventory(playerAuthor, restoreInventory);
                         }
                     }.runTaskLater(pluginInstance, 1L);

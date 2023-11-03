@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.neomechanical</groupId>
         <artifactId>NeoConfig-parent</artifactId>
-        <version>1.5.6</version>
+        <version>1.5.7</version>
     </parent>
     <packaging>jar</packaging>
     <properties>
@@ -18,12 +18,12 @@
         <dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui</artifactId>
-            <version>1.6.3-SNAPSHOT</version>
+            <version>1.9.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </dependency>
         <!--This adds the Spigot API artifact to the build -->
         <dependency>

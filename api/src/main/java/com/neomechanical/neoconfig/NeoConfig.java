@@ -6,20 +6,18 @@ import com.neomechanical.neoutils.config.ConfigManager;
 import com.neomechanical.neoutils.languages.LanguageManager;
 import com.neomechanical.neoutils.manager.ManagerHandler;
 import com.neomechanical.neoutils.updates.UpdateChecker;
+import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.neomechanical.neoutils.updates.IsUpToDate.isUpToDate;
 
 public final class NeoConfig extends JavaPlugin {
+    @Getter
     private static NeoConfig instance;
 
     private void setInstance(NeoConfig instance) {
         NeoConfig.instance = instance;
-    }
-
-    public static NeoConfig getInstance() {
-        return instance;
     }
 
     private static ManagerHandler managers;
