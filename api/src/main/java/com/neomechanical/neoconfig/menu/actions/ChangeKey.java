@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig.menu.actions;
 
+import com.neomechanical.neoconfig.api.NeoConfigAPI;
 import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
@@ -16,14 +17,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static com.neomechanical.neoconfig.NeoConfig.getLanguageManager;
 
 public class ChangeKey {
     private final ConfigurationSection key;
@@ -115,11 +113,11 @@ public class ChangeKey {
             if (initialKeyValueList != null) {
                 initialKeyValueShow = initialKeyValueList.get(initialKeyValueIndex).toString();
             } else {
-                MessageUtil.sendMM(player, getLanguageManager().getString("generic.errorUnknown", null));
+                MessageUtil.sendMM(player, NeoConfigAPI.getProvider().getLanguageManager().getString("generic.errorUnknown", null));
                 return;
             }
         } else {
-            MessageUtil.sendMM(player, getLanguageManager().getString("generic.errorUnknown", null));
+            MessageUtil.sendMM(player, NeoConfigAPI.getProvider().getLanguageManager().getString("generic.errorUnknown", null));
             return;
         }
         if (!isSafeToEdit(initialKeyValueShow, player)) {

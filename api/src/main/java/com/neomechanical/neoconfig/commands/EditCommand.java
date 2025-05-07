@@ -1,6 +1,6 @@
 package com.neomechanical.neoconfig.commands;
 
-import com.neomechanical.neoconfig.NeoConfig;
+import com.neomechanical.neoconfig.api.NeoConfigAPI;
 import com.neomechanical.neoconfig.menu.ConfigMenu;
 import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.commands.Command;
@@ -56,7 +56,7 @@ public class EditCommand extends Command {
             return;
         }
         if (player.hasPermission("neoconfig.edit." + plugin.getName())) {
-            new ConfigMenu(NeoConfig.getInstance())
+            new ConfigMenu(NeoConfigAPI.getProvider().getPlugin())
                     .permission("neoconfig.edit." + plugin.getName(),
                             () -> languageManager.getString("commandGeneric.errorNoPermission", null))
                     //Set it to open the plugin specified

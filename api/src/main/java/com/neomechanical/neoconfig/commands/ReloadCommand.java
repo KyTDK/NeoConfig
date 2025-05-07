@@ -1,6 +1,6 @@
 package com.neomechanical.neoconfig.commands;
 
-import com.neomechanical.neoconfig.NeoConfig;
+import com.neomechanical.neoconfig.api.NeoConfigAPI;
 import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.commands.Command;
 import com.neomechanical.neoutils.messages.MessageUtil;
@@ -37,7 +37,7 @@ public class ReloadCommand extends Command {
 
     @Override
     public void perform(CommandSender commandSender, String[] strings) {
-        NeoConfig.reload();
+        NeoConfigAPI.getProvider().reloadConfig();
         MessageUtil.sendMM(commandSender, NeoUtils.getNeoUtilities().getManagers().getLanguageManager().getString("reload.onReload", null));
     }
 
