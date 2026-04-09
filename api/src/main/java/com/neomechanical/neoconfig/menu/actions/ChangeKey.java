@@ -7,8 +7,13 @@ import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.java.Lists;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import net.wesjd.anvilgui.AnvilGUI;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.ConversationFactory;
+import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
@@ -76,6 +81,12 @@ public class ChangeKey {
         if (!isSafeToEdit(initialKeyValue, player)) {
             return;
         }
+        if (shouldUseConversationInsteadOfAnvil()) {
+            closeOpenConfigMenu(player);
+            new ConversationEditor((JavaPlugin) pluginInstance).main(
+                    player, initialKeyValue, key, subKey, config, file, completeFunction, closeFunction, restoreInventory);
+            return;
+        }
         new AnvilGUI.Builder()
                 .onClick((slot, stateSnapshot) -> {
                     if(slot != AnvilGUI.Slot.OUTPUT) {
@@ -123,6 +134,11 @@ public class ChangeKey {
         if (!isSafeToEdit(initialKeyValueShow, player)) {
             return;
         }
+        if (shouldUseConversationInsteadOfAnvil()) {
+            closeOpenConfigMenu(player);
+            beginListValueConversation(player, initialKeyValueIndex, initialKeyValueList, initialKeyValueShow);
+            return;
+        }
         new AnvilGUI.Builder().
                 onClose(completion -> {//called when the inventory output slot is clicked
                     String text = completion.getText();
@@ -163,6 +179,82 @@ public class ChangeKey {
                 .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
                 .plugin(pluginInstance)                                          //set the plugin instance
                 .open(player);
+    }
+
+    /**
+     * Modern Paper uses an unversioned {@code org.bukkit.craftbukkit} package. AnvilGUI still ships Spigot-mapped
+     * {@code v1_* craftbukkit} types that Paper does not reliably remap inside shaded uber-jars, so prefer chat input.
+     */
+    private static boolean shouldUseConversationInsteadOfAnvil() {
+        try {
+            Package pkg = Bukkit.getServer().getClass().getPackage();
+            if (pkg == null) {
+                return true;
+            }
+            return !pkg.getName().contains(".v1_");
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    private void closeOpenConfigMenu(Player player) {
+        InventoryGUI currentInventory = NeoUtils.getNeoUtilities().getManagers().getInventoryManager()
+                .getInventoryGUI(player.getOpenInventory().getTopInventory());
+        if (currentInventory != null) {
+            currentInventory.close(player);
+        }
+    }
+
+    private void beginListValueConversation(Player player, int index, List<?> initialKeyValueList, String previousShown) {
+        ConversationFactory factory = new ConversationFactory((JavaPlugin) pluginInstance)
+                .withModality(true)
+                .withFirstPrompt(new StringPrompt() {
+                    @Override
+                    public String getPromptText(ConversationContext context) {
+                        return (title != null ? title : "Change key") + " (was: " + previousShown + ")";
+                    }
+
+                    @Override
+                    public Prompt acceptInput(ConversationContext context, String text) {
+                        try {
+                            applyListEditAtIndex(index, initialKeyValueList, text);
+                            if (completeFunction != null) {
+                                completeFunction.accept(player, text);
+                            }
+                        } catch (Exception ex) {
+                            MessageUtil.sendMM(player, "<red>" + ex.getMessage());
+                        }
+                        if (closeFunction != null) {
+                            closeFunction.accept(player);
+                        }
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                InventoryUtil.openInventory(player, restoreInventory);
+                            }
+                        }.runTaskLater(pluginInstance, 1L);
+                        return Prompt.END_OF_CONVERSATION;
+                    }
+                });
+        factory.buildConversation(player).begin();
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void applyListEditAtIndex(int index, List<?> initialKeyValueList, String text) throws IOException {
+        Object sample = initialKeyValueList.get(0);
+        if (sample instanceof String) {
+            ((List) initialKeyValueList).set(index, text);
+        } else if (sample instanceof Integer) {
+            ((List) initialKeyValueList).set(index, Integer.parseInt(text));
+        } else if (sample instanceof Double) {
+            ((List) initialKeyValueList).set(index, Double.parseDouble(text));
+        } else if (sample instanceof Boolean) {
+            ((List) initialKeyValueList).set(index, Boolean.parseBoolean(text));
+        } else {
+            throw new IllegalArgumentException("Unsupported type");
+        }
+        key.set(subKey, initialKeyValueList);
+        config.save(file);
     }
 
     private <type> void updateList(String initialKeyValueShow, List<?> initialKeyValueList, String text) {
