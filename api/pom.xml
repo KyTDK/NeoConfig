@@ -18,6 +18,7 @@
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui</artifactId>
             <version>1.10.5-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
@@ -44,7 +45,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <minimizeJar>true</minimizeJar>
+                    <minimizeJar>false</minimizeJar>
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
@@ -60,16 +61,6 @@
                             <shadedPattern>com.neomechanical.neoconfig.neoutils</shadedPattern>
                         </relocation>
                     </relocations>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludeDefaults>false</excludeDefaults>
-                            <includes>
-                                <include>net/wesjd/anvilgui/**</include>
-                                <include>com/neomechanical/neoutils/**</include>
-                            </includes>
-                        </filter>
-                    </filters>
                 </configuration>
                 <executions>
                     <execution>
