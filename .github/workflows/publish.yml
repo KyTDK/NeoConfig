@@ -50,7 +50,7 @@ jobs:
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
 
       - name: Deploy API module
-        run: mvn -B -ntp -pl api -am deploy -DskipTests --settings ~/.m2/settings.xml
+        run: mvn -U -B -ntp -pl api -am deploy -DskipTests --settings ~/.m2/settings.xml
         env:
           NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
           NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
