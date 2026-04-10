@@ -1,7 +1,6 @@
 name: Publish
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - "v*"
@@ -54,6 +53,19 @@ jobs:
         run: |
           VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version | tail -n 1)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate release tag and version
+        run: |
+          VERSION="${{ steps.project_version.outputs.version }}"
+          EXPECTED_TAG="v$VERSION"
+          if [[ "$VERSION" == *-SNAPSHOT ]]; then
+            echo "Release workflow cannot publish snapshot version: $VERSION" >&2
+            exit 1
+          fi
+          if [ "${GITHUB_REF_NAME}" != "$EXPECTED_TAG" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match project.version $VERSION. Expected $EXPECTED_TAG." >&2
+            exit 1
+          fi
 
       - name: Check whether release already exists
         id: release_state
