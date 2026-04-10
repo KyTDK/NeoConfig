@@ -2,7 +2,6 @@ package com.neomechanical.neoconfig.menu.actions;
 
 import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
-import com.neomechanical.neoutils.inventory.actions.OpenInventory;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryItem;
 import com.neomechanical.neoutils.items.ItemUtil;
@@ -11,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
@@ -110,22 +108,40 @@ public class ListEditor {
         InventoryGUI elementalGUI = InventoryUtil.createInventoryGUI(player, 9, "List Editor");
         elementalGUI.setOpenOnClose(restoreInventory);
         List<InventoryGUI> pages = elementalGUI.getPages();
-        for (Object object : initialKeyValue) {
-            InventoryGUI inventoryToHandle;
-            int initialKeyValueIndex = initialKeyValue.indexOf(object);
-            if (!pages.isEmpty()) {
-                //Get the last page in the list
-                inventoryToHandle = pages.get(pages.size() - 1);
-            } else {
-                inventoryToHandle = elementalGUI;
+        if (initialKeyValue.isEmpty()) {
+            InventoryItem close = new InventoryItem.InventoryItemBuilder(
+                    () -> ItemUtil.createItem(Material.BARRIER, "&cClose"))
+                    .setAction((event) -> InventoryUtil.openInventory(player, restoreInventory))
+                    .build();
+            InventoryItem empty = new InventoryItem.InventoryItemBuilder(
+                    () -> ItemUtil.createItem(Material.PAPER, "&eThis list is empty"))
+                    .build();
+            elementalGUI.setItem(0, close);
+            elementalGUI.setItem(4, empty);
+            InventoryUtil.openInventory(player, elementalGUI);
+            return;
+        }
+        Material button = ((ItemVersionWrapper) NeoUtils.getNeoUtilities().getInternalVersions().get("items")).oakButton();
+        for (int initialKeyValueIndex = 0; initialKeyValueIndex < initialKeyValue.size(); initialKeyValueIndex++) {
+            final int listIndex = initialKeyValueIndex;
+            final Object object = initialKeyValue.get(listIndex);
+            InventoryGUI inventoryToHandle = pages.isEmpty() ? elementalGUI : pages.get(pages.size() - 1);
+            ChangeKey changeKey = new ChangeKey(subKey, config, file, key,
+                    elementalGUI, completeFunction, closeFunction, perm, title, permMessage, pluginInstance);
+            if (listIndex == 0) {
                 InventoryItem close = new InventoryItem.InventoryItemBuilder(
                         () -> ItemUtil.createItem(Material.BARRIER, "&cClose"))
                         .setAction((event) -> InventoryUtil.openInventory(player, restoreInventory))
                         .build();
                 inventoryToHandle.setItem(0, close);
+            } else {
+                InventoryGUI previousInventory = listIndex == 1 ? elementalGUI : pages.get(pages.size() - 2);
+                InventoryItem left = new InventoryItem.InventoryItemBuilder(
+                        () -> ItemUtil.createItem(button, "&aLeft"))
+                        .setAction((event) -> InventoryUtil.openInventory(player, previousInventory))
+                        .build();
+                inventoryToHandle.setItem(0, left);
             }
-            ChangeKey changeKey = new ChangeKey(subKey, config, file, key,
-                    elementalGUI, completeFunction, closeFunction, perm, title, permMessage, pluginInstance);
             //inventoryToHandle is an empty page
             InventoryItem edit = new InventoryItem.InventoryItemBuilder(() -> {
                 List<?> initialKeyValueList;
@@ -133,7 +149,7 @@ public class ListEditor {
                 if (key.get(subKey) instanceof List) {
                     initialKeyValueList = (List<?>) key.get(subKey);
                     if (initialKeyValueList != null) {
-                        initialKeyValueShow = initialKeyValueList.get(initialKeyValueIndex).toString();
+                        initialKeyValueShow = initialKeyValueList.get(listIndex).toString();
                     } else {
                         initialKeyValueShow = object.toString();
                     }
@@ -141,33 +157,17 @@ public class ListEditor {
                     initialKeyValueShow = object.toString();
                 }
                 return ItemUtil.createItem(Material.TRIPWIRE_HOOK, "&aEdit '" + initialKeyValueShow + "'");
-            }).setAction((event) -> changeKey.actionList(event, initialKeyValueIndex))
+            }).setAction((event) -> changeKey.actionList(event, listIndex))
                     .build();
             inventoryToHandle.setItem(4, edit);
-            Material button = ((ItemVersionWrapper) NeoUtils.getNeoUtilities().getInternalVersions().get("items")).oakButton();
-            if (!pages.isEmpty()) {
-                Consumer<InventoryClickEvent> close;
-                if (pages.size() == 1) {
-                    close = (event) -> InventoryUtil.openInventory(player, elementalGUI);
-                } else {
-                    close = (event) -> new OpenInventory(pages.get(pages.indexOf(inventoryToHandle) - 1)).action(event);
-                }
-                InventoryItem left = new InventoryItem.InventoryItemBuilder(
-                        () -> ItemUtil.createItem(button, "&aLeft"))
-                        .setAction(close)
-                        .build();
-                inventoryToHandle.setItem(0, left);
-            }
-            if (initialKeyValue.indexOf(object) != initialKeyValue.size() - 1) {
+            if (listIndex != initialKeyValue.size() - 1) {
+                elementalGUI.addPage(InventoryUtil.createInventoryGUI(player, elementalGUI.getSize(), elementalGUI.getTitle()));
+                InventoryGUI nextInventory = pages.get(pages.size() - 1);
                 InventoryItem right = new InventoryItem.InventoryItemBuilder(
                         () -> ItemUtil.createItem(button, "&aRight"))
-                        .setAction((event) -> InventoryUtil.openInventory(player, pages.get(pages.indexOf(inventoryToHandle) + 1)))
+                        .setAction((event) -> InventoryUtil.openInventory(player, nextInventory))
                         .build();
                 inventoryToHandle.setItem(8, right);
-            }
-            //Create a new empty page if there is another object next
-            if (initialKeyValue.indexOf(object) != initialKeyValue.size() - 1) {
-                elementalGUI.addPage(InventoryUtil.createInventoryGUI(player, elementalGUI.getSize(), elementalGUI.getTitle()));
             }
         }
         InventoryUtil.openInventory(player, elementalGUI);

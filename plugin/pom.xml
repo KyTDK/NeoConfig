@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.neomechanical</groupId>
             <artifactId>NeoConfig</artifactId>
-            <version>1.5.13</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Spigot API -->
@@ -40,7 +40,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.6.0</version>
+                <configuration>
+                    <minimizeJar>false</minimizeJar>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>com.neomechanical.neoconfig</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.neomechanical.neoutils</pattern>
+                            <shadedPattern>com.neomechanical.neoconfig.neoutils</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>

@@ -1,5 +1,6 @@
 package com.neomechanical.neoconfig;
 
+import com.neomechanical.neoconfig.api.NeoConfigAPI;
 import com.neomechanical.neoconfig.api.NeoConfigProvider;
 import com.neomechanical.neoconfig.commands.RegisterCommands;
 import com.neomechanical.neoutils.NeoUtils;
@@ -7,7 +8,6 @@ import com.neomechanical.neoutils.config.ConfigManager;
 import com.neomechanical.neoutils.languages.LanguageManager;
 import com.neomechanical.neoutils.manager.ManagerHandler;
 import com.neomechanical.neoutils.updates.UpdateChecker;
-import lombok.Getter;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,7 +32,7 @@ public final class NeoConfig extends JavaPlugin implements NeoConfigProvider {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        NeoConfigAPI.setProvider(null);
     }
 
     /**
@@ -56,6 +56,7 @@ public final class NeoConfig extends JavaPlugin implements NeoConfigProvider {
     @Override
     public void onEnable() {
         managers = NeoUtils.getNeoUtilities().getManagers();
+        NeoConfigAPI.setProvider(this);
         // Create config
         managers.createNewConfigManager("config.yml");
         // Create language manager

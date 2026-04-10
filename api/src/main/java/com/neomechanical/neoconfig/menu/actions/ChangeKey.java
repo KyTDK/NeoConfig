@@ -4,7 +4,6 @@ import com.neomechanical.neoconfig.api.NeoConfigAPI;
 import com.neomechanical.neoutils.NeoUtils;
 import com.neomechanical.neoutils.inventory.InventoryUtil;
 import com.neomechanical.neoutils.inventory.managers.data.InventoryGUI;
-import com.neomechanical.neoutils.java.Lists;
 import com.neomechanical.neoutils.messages.MessageUtil;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
@@ -89,14 +88,14 @@ public class ChangeKey {
         }
         new AnvilGUI.Builder()
                 .onClick((slot, stateSnapshot) -> {
-                    if(slot != AnvilGUI.Slot.OUTPUT) {
+                    if (slot != AnvilGUI.Slot.OUTPUT) {
                         return Collections.emptyList();
                     }
                     String text = stateSnapshot.getText();
                     setKey(initialKeyValue, key, subKey, text, config, file, completeFunction, player);
                     return Collections.singletonList(AnvilGUI.ResponseAction.close());
                 })
-                .title(title)
+                .title(getEditorTitle())
                 .onClose(stateSnapshot -> {//called when the inventory is closed
                     if (closeFunction != null) {
                         closeFunction.accept(player);
@@ -109,9 +108,8 @@ public class ChangeKey {
                         }
                     }.runTaskLater(pluginInstance, 1L);
                 })
-                .text(initialKeyValue.toString())                              //sets the text the GUI should start with
-                .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
-                .plugin(pluginInstance)                                          //set the plugin instance
+                .text(initialKeyValue.toString())
+                .plugin(pluginInstance)
                 .open(player);
     }
 
@@ -139,30 +137,23 @@ public class ChangeKey {
             beginListValueConversation(player, initialKeyValueIndex, initialKeyValueList, initialKeyValueShow);
             return;
         }
-        new AnvilGUI.Builder().
-                onClose(completion -> {//called when the inventory output slot is clicked
-                    String text = completion.getText();
-                    if (initialKeyValueList.get(0) instanceof String) {
-                        updateList(initialKeyValueShow, initialKeyValueList, text);
-                    } else if (initialKeyValueList.get(0) instanceof Integer) {
-                        updateList(initialKeyValueShow, initialKeyValueList, text);
-                    } else if (initialKeyValueList.get(0) instanceof Double) {
-                        updateList(initialKeyValueShow, initialKeyValueList, text);
-                    } else if (initialKeyValueList.get(0) instanceof Boolean) {
-                        updateList(initialKeyValueShow, initialKeyValueList, text);
-                    } else {
-                        throw new IllegalArgumentException("Unsupported type");
+        new AnvilGUI.Builder()
+                .onClick((slot, stateSnapshot) -> {
+                    if (slot != AnvilGUI.Slot.OUTPUT) {
+                        return Collections.emptyList();
                     }
                     try {
-                        config.save(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        applyListEditAtIndex(initialKeyValueIndex, initialKeyValueList, stateSnapshot.getText());
+                        if (completeFunction != null) {
+                            completeFunction.accept(player, stateSnapshot.getText());
+                        }
+                    } catch (Exception ex) {
+                        MessageUtil.sendMM(player, "<red>" + ex.getMessage());
+                        return Collections.emptyList();
                     }
-                    if (completeFunction != null) {
-                        completeFunction.accept(player, text);
-                    }
+                    return Collections.singletonList(AnvilGUI.ResponseAction.close());
                 })
-                .title(title)
+                .title(getEditorTitle())
                 .onClose(stateSnapshot -> {//called when the inventory is closed
                     if (closeFunction != null) {
                         closeFunction.accept(player);
@@ -175,9 +166,8 @@ public class ChangeKey {
                         }
                     }.runTaskLater(pluginInstance, 1L);
                 })
-                .text(initialKeyValueShow)                              //sets the text the GUI should start with
-                .title("Change key")                                       //set the title of the GUI (only works in 1.14+)
-                .plugin(pluginInstance)                                          //set the plugin instance
+                .text(initialKeyValueShow)
+                .plugin(pluginInstance)
                 .open(player);
     }
 
@@ -241,42 +231,36 @@ public class ChangeKey {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void applyListEditAtIndex(int index, List<?> initialKeyValueList, String text) throws IOException {
-        Object sample = initialKeyValueList.get(0);
-        if (sample instanceof String) {
-            ((List) initialKeyValueList).set(index, text);
-        } else if (sample instanceof Integer) {
-            ((List) initialKeyValueList).set(index, Integer.parseInt(text));
-        } else if (sample instanceof Double) {
-            ((List) initialKeyValueList).set(index, Double.parseDouble(text));
-        } else if (sample instanceof Boolean) {
-            ((List) initialKeyValueList).set(index, Boolean.parseBoolean(text));
-        } else {
-            throw new IllegalArgumentException("Unsupported type");
-        }
+        Object sample = initialKeyValueList.get(index);
+        ((List) initialKeyValueList).set(index, parseValue(sample, text));
         key.set(subKey, initialKeyValueList);
         config.save(file);
     }
 
-    private <type> void updateList(String initialKeyValueShow, List<?> initialKeyValueList, String text) {
-        List<type> newList = Lists.cast(initialKeyValueList);
-        newList.set(newList.indexOf(initialKeyValueShow), (type) text);
-        key.set(subKey, newList);
+    private Object parseValue(Object sample, String text) {
+        if (sample instanceof String) {
+            return text;
+        }
+        if (sample instanceof Integer) {
+            return Integer.parseInt(text);
+        }
+        if (sample instanceof Double) {
+            return Double.parseDouble(text);
+        }
+        if (sample instanceof Boolean) {
+            return Boolean.parseBoolean(text);
+        }
+        throw new IllegalArgumentException("Unsupported type");
+    }
+
+    private String getEditorTitle() {
+        return title != null ? title : "Change key";
     }
 
     public static void setKey(Object initialKeyValue, ConfigurationSection key, String subKey,
                               String text, FileConfiguration config, File file,
                               BiConsumer<Player, String> completeFunction, Player player) {
-        if (initialKeyValue instanceof String) {
-            key.set(subKey, text);
-        } else if (initialKeyValue instanceof Integer) {
-            key.set(subKey, Integer.parseInt(text));
-        } else if (initialKeyValue instanceof Double) {
-            key.set(subKey, Double.parseDouble(text));
-        } else if (initialKeyValue instanceof Boolean) {
-            key.set(subKey, Boolean.parseBoolean(text));
-        } else {
-            throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
-        }
+        key.set(subKey, parseSingleValue(initialKeyValue, text));
         try {
             config.save(file);
         } catch (IOException e) {
@@ -285,6 +269,22 @@ public class ChangeKey {
         if (completeFunction != null) {
             completeFunction.accept(player, text);
         }
+    }
+
+    private static Object parseSingleValue(Object initialKeyValue, String text) {
+        if (initialKeyValue instanceof String) {
+            return text;
+        }
+        if (initialKeyValue instanceof Integer) {
+            return Integer.parseInt(text);
+        }
+        if (initialKeyValue instanceof Double) {
+            return Double.parseDouble(text);
+        }
+        if (initialKeyValue instanceof Boolean) {
+            return Boolean.parseBoolean(text);
+        }
+        throw new IllegalArgumentException("Unsupported type: " + initialKeyValue.getClass().getName());
     }
     /**
      *
